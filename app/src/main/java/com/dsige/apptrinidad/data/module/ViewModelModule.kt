@@ -17,13 +17,8 @@ abstract class ViewModelModule {
 
     @Binds
     @IntoMap
-    @ViewModelKey(ServicesViewModel::class)
-    internal abstract fun bindServicesViewModel(servicioViewModel: ServicesViewModel): ViewModel
-
-    @Binds
-    @IntoMap
-    @ViewModelKey(SuministroViewModel::class)
-    internal abstract fun bindSuministroViewModel(suministroViewModel: SuministroViewModel): ViewModel
+    @ViewModelKey(RegistroViewModel::class)
+    internal abstract fun bindSuministroViewModel(registroViewModel: RegistroViewModel): ViewModel
 
     @Binds
     internal abstract fun bindViewModelFactory(factory: ViewModelFactory): ViewModelProvider.Factory

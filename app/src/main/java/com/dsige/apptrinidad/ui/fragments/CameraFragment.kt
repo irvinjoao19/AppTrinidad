@@ -37,7 +37,6 @@ private const val ARG_PARAM2 = "param2"
 private const val ARG_PARAM3 = "param3"
 private const val ARG_PARAM4 = "param4"
 private const val ARG_PARAM5 = "param5"
-private const val ARG_PARAM6 = "param6"
 
 class CameraFragment : Fragment(), View.OnClickListener, View.OnTouchListener {
 
@@ -327,28 +326,25 @@ class CameraFragment : Fragment(), View.OnClickListener, View.OnTouchListener {
         ) {
             process(result)
         }
-
     }
 
-    var suministroId: Int = 0
-    var beforeOrAfter: Int = 0
-    var orden: Int = 0
-    var suministroOrden: Int = 0
-    var tipo: Int = 0
-    var size: Int = 0
-    var nameImg: String = ""
+    private var tipo: Int = 0
+    private var usuarioId: String = ""
+    private var nameImg: String = ""
+    private var registroId: Int = 0
+    private var tipoDetalle: Int = 0
+    private var detalleId: Int = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            suministroId = it.getInt(ARG_PARAM1)
-            orden = it.getInt(ARG_PARAM2)
-            tipo = it.getInt(ARG_PARAM3)
-            size = it.getInt(ARG_PARAM4)
-            beforeOrAfter = it.getInt(ARG_PARAM5)
-            suministroOrden = it.getInt(ARG_PARAM6)
+            tipo = it.getInt(ARG_PARAM1)
+            usuarioId = it.getString(ARG_PARAM2)!!
+            registroId = it.getInt(ARG_PARAM3)
+            tipoDetalle = it.getInt(ARG_PARAM4)
+            detalleId = it.getInt(ARG_PARAM5)
         }
     }
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -363,8 +359,8 @@ class CameraFragment : Fragment(), View.OnClickListener, View.OnTouchListener {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        nameImg = Util.getFechaActualForPhoto(suministroId)
-        file = File(Util.getFolder(), nameImg)
+        nameImg = Util.getFechaActualForPhoto(usuarioId)
+        file = File(Util.getFolder(context!!), nameImg)
     }
 
     override fun onResume() {
@@ -741,22 +737,17 @@ class CameraFragment : Fragment(), View.OnClickListener, View.OnTouchListener {
             val captureCallback = object : CameraCaptureSession.CaptureCallback() {
 
                 override fun onCaptureCompleted(
-                    session: CameraCaptureSession,
-                    request: CaptureRequest,
-                    result: TotalCaptureResult
+                    s: CameraCaptureSession, request: CaptureRequest, result: TotalCaptureResult
                 ) {
 
                     startActivity(
-                        Intent(
-                            context!!, PreviewCameraActivity::class.java
-                        )
-                            .putExtra("suministroId", suministroId)
+                        Intent(context!!, PreviewCameraActivity::class.java)
                             .putExtra("nameImg", nameImg)
-                            .putExtra("orden", orden)
-                            .putExtra("suministroOrden", suministroOrden)
-                            .putExtra("beforeOrAfter", beforeOrAfter)
                             .putExtra("tipo", tipo)
-                            .putExtra("size", size)
+                            .putExtra("usuarioId", usuarioId)
+                            .putExtra("id", registroId)
+                            .putExtra("detalleId", detalleId)
+                            .putExtra("tipoDetalle", tipoDetalle)
                     )
                     activity!!.finish()
                     unlockFocus()
@@ -910,7 +901,6 @@ class CameraFragment : Fragment(), View.OnClickListener, View.OnTouchListener {
             maxHeight: Int,
             aspectRatio: Size
         ): Size {
-
             // Collect the supported resolutions that are at least as big as the preview Surface
             val bigEnough = ArrayList<Size>()
             // Collect the supported resolutions that are smaller than the preview Surface
@@ -942,17 +932,14 @@ class CameraFragment : Fragment(), View.OnClickListener, View.OnTouchListener {
         }
 
         @JvmStatic
-        fun newInstance(
-            param1: Int, param2: Int, param3: Int, param4: Int, param5: Int, param6: Int
-        ) =
+        fun newInstance(param1: Int, param2: String, param3: Int, param4: Int,param5: Int) =
             CameraFragment().apply {
                 arguments = Bundle().apply {
                     putInt(ARG_PARAM1, param1)
-                    putInt(ARG_PARAM2, param2)
+                    putString(ARG_PARAM2, param2)
                     putInt(ARG_PARAM3, param3)
                     putInt(ARG_PARAM4, param4)
                     putInt(ARG_PARAM5, param5)
-                    putInt(ARG_PARAM6, param6)
                 }
             }
     }

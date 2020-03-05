@@ -1,7 +1,5 @@
 package com.dsige.apptrinidad.helper
 
-import com.dsige.apptrinidad.helper.MensajeDetalle
-
 open class Mensaje {
 
     var codigo: Int = 0

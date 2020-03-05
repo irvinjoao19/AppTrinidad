@@ -1,18 +1,15 @@
 package com.dsige.apptrinidad.data.viewModel
 
-import android.os.Environment
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.dsige.apptrinidad.data.local.model.Registro
-import com.dsige.apptrinidad.data.local.model.RegistroPhoto
-import com.dsige.apptrinidad.data.local.model.Sync
+import com.dsige.apptrinidad.data.local.model.RegistroDetalle
 import com.dsige.apptrinidad.data.local.model.Usuario
 import com.dsige.apptrinidad.data.local.repository.ApiError
 import com.dsige.apptrinidad.data.local.repository.AppRepository
 import com.dsige.apptrinidad.helper.Mensaje
-import com.dsige.apptrinidad.helper.Util
 import com.google.gson.Gson
 import com.jakewharton.retrofit2.adapter.rxjava2.HttpException
 import io.reactivex.CompletableObserver
@@ -22,10 +19,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
-import okhttp3.MediaType
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
-import java.io.File
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -51,7 +45,6 @@ internal constructor(private val roomRepository: AppRepository, private val retr
     }
 
     fun getLogin(usuario: String, pass: String, imei: String, version: String) {
-        mensajeError.value = null
         roomRepository.getUsuarioService(usuario, pass, imei, version)
             .delay(1000, TimeUnit.MILLISECONDS)
             .subscribeOn(Schedulers.io())
@@ -62,7 +55,7 @@ internal constructor(private val roomRepository: AppRepository, private val retr
                 }
 
                 override fun onNext(usuario: Usuario) {
-                    insertUsuario(usuario, version)
+                    insertUsuario(usuario)
                 }
 
                 override fun onError(t: Throwable) {
@@ -84,7 +77,7 @@ internal constructor(private val roomRepository: AppRepository, private val retr
             })
     }
 
-    fun insertUsuario(u: Usuario, v: String) {
+    fun insertUsuario(u: Usuario) {
         roomRepository.insertUsuario(u)
             .delay(3, TimeUnit.SECONDS)
             .subscribeOn(Schedulers.computation())
@@ -94,7 +87,7 @@ internal constructor(private val roomRepository: AppRepository, private val retr
                 }
 
                 override fun onComplete() {
-                    getSync(u.operarioId, v)
+                    mensajeSuccess.value = "Logeado"
                 }
 
                 override fun onError(e: Throwable) {
@@ -122,77 +115,6 @@ internal constructor(private val roomRepository: AppRepository, private val retr
             })
     }
 
-    fun getSync(operarioId: Int, version: String) {
-        roomRepository.deleteTotal()
-            .subscribeOn(Schedulers.computation())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(object : CompletableObserver {
-                override fun onSubscribe(d: Disposable) {
-                }
-
-                override fun onComplete() {
-                    sync(operarioId, version)
-                }
-
-                override fun onError(e: Throwable) {
-                    mensajeError.value = e.toString()
-                }
-            })
-    }
-
-    private fun sync(operarioId: Int, version: String) {
-        roomRepository.getSync(operarioId, version)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(object : Observer<Sync> {
-                override fun onComplete() {
-
-                }
-
-                override fun onSubscribe(d: Disposable) {
-
-                }
-
-                override fun onNext(t: Sync) {
-                    insertSync(t)
-                }
-
-                override fun onError(e: Throwable) {
-                    if (e is HttpException) {
-                        val body = e.response().errorBody()
-                        try {
-                            val error = retrofit.errorConverter.convert(body!!)
-                            mensajeError.postValue(error.Message)
-                        } catch (e1: IOException) {
-                            e1.printStackTrace()
-                            Log.i("TAG", e1.toString())
-                        }
-                    } else {
-                        mensajeError.postValue(e.toString())
-                    }
-                }
-            })
-    }
-
-    fun insertSync(s: Sync) {
-        roomRepository.saveSync(s)
-            .delay(1, TimeUnit.SECONDS)
-            .subscribeOn(Schedulers.computation())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(object : CompletableObserver {
-                override fun onSubscribe(d: Disposable) {
-                }
-
-                override fun onComplete() {
-                    mensajeSuccess.value = "Sincronización Completa"
-                }
-
-                override fun onError(e: Throwable) {
-                    mensajeError.value = e.toString()
-                }
-            })
-    }
-
     fun getSizeRegistro(): LiveData<Int> {
         return roomRepository.getSizeRegistro()
     }
@@ -202,22 +124,22 @@ internal constructor(private val roomRepository: AppRepository, private val retr
         auditorias.flatMap { observable ->
             Observable.fromIterable(observable).flatMap { a ->
                 val b = MultipartBody.Builder()
-                val photos: List<RegistroPhoto>? = a.photos
-                if (photos != null) {
-                    for (p: RegistroPhoto in photos) {
-                        if (p.rutaFoto.isNotEmpty()) {
-                            val file =
-                                File(Environment.getExternalStorageDirectory().toString() + "/" + Util.FolderImg + "/" + p.rutaFoto)
-                            if (file.exists()) {
-                                b.addFormDataPart(
-                                    "fotos",
-                                    file.name,
-                                    RequestBody.create(MediaType.parse("multipart/form-data"), file)
-                                )
-                            }
-                        }
-                    }
-                }
+//                val detalles: List<RegistroDetalle>? = a.detalles
+//                if (detalles != null) {
+//                    for (p: RegistroDetalle in detalles) {
+//                        if (p.fot.isNotEmpty()) {
+//                            val file =
+//                                File(Environment.getExternalStorageDirectory().toString() + "/" + Util.FolderImg + "/" + p.rutaFoto)
+//                            if (file.exists()) {
+//                                b.addFormDataPart(
+//                                    "fotos",
+//                                    file.name,
+//                                    RequestBody.create(MediaType.parse("multipart/form-data"), file)
+//                                )
+//                            }
+//                        }
+//                    }
+//                }
 
                 val json = Gson().toJson(a)
                 Log.i("TAG", json)
@@ -273,25 +195,25 @@ internal constructor(private val roomRepository: AppRepository, private val retr
             .flatMap { observable ->
                 Observable.fromIterable(observable).flatMap { a ->
                     val b = MultipartBody.Builder()
-                    val photos: List<RegistroPhoto>? = a.photos
-                    if (photos != null) {
-                        for (p: RegistroPhoto in photos) {
-                            if (p.rutaFoto.isNotEmpty()) {
-                                val file =
-                                    File(Environment.getExternalStorageDirectory().toString() + "/" + Util.FolderImg + "/" + p.rutaFoto)
-                                if (file.exists()) {
-                                    b.addFormDataPart(
-                                        "fotos",
-                                        file.name,
-                                        RequestBody.create(
-                                            MediaType.parse("multipart/form-data"),
-                                            file
-                                        )
-                                    )
-                                }
-                            }
-                        }
-                    }
+//                    val detalles: List<RegistroDetalle>? = a.detalles
+//                    if (detalles != null) {
+//                        for (p: RegistroDetalle in detalles) {
+//                            if (p.rutaFoto.isNotEmpty()) {
+//                                val file =
+//                                    File(Environment.getExternalStorageDirectory().toString() + "/" + Util.FolderImg + "/" + p.rutaFoto)
+//                                if (file.exists()) {
+//                                    b.addFormDataPart(
+//                                        "fotos",
+//                                        file.name,
+//                                        RequestBody.create(
+//                                            MediaType.parse("multipart/form-data"),
+//                                            file
+//                                        )
+//                                    )
+//                                }
+//                            }
+//                        }
+//                    }
                     b.setType(MultipartBody.FORM)
                     val body = b.build()
                     Observable.zip(
@@ -333,7 +255,6 @@ internal constructor(private val roomRepository: AppRepository, private val retr
                 }
             })
     }
-
 
     private fun updateRegistro(messages: Mensaje) {
         roomRepository.updateRegistro(messages)

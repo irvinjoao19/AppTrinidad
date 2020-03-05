@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.activities.MainActivity">
+    tools:context=".ui.activities.RegistroActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -28,8 +28,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:context=".ui.activities.RegistroActivity">
+            android:layout_height="match_parent">
 
             <TextView
                 android:id="@+id/textView1"
@@ -74,23 +73,94 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
-                android:inputType="text"
+                android:inputType="number"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/textView2"
                 app:layout_constraintTop_toBottomOf="@+id/editTextObra" />
+
+            <!--todo inicio-->
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutReparacion"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView2">
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/checkbox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="16dp"
+                    android:text="Adicionar Puntos Antes (Off) | Despues (On)"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextNombrePunto"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:hint="Nombre del Punto"
+                    android:inputType="text"
+                    android:textColorHint="@color/colorPrimary"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/checkbox" />
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextLargo"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:hint="Largo"
+                    android:inputType="numberDecimal"
+                    android:textColorHint="@color/colorPrimary"
+                    app:layout_constraintEnd_toStartOf="@+id/editTextAncho"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/editTextNombrePunto" />
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextAncho"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:hint="Ancho"
+                    android:inputType="numberDecimal"
+                    android:textColorHint="@color/colorPrimary"
+                    app:layout_constraintEnd_toStartOf="@+id/editTextM3"
+                    app:layout_constraintStart_toEndOf="@+id/editTextLargo"
+                    app:layout_constraintTop_toBottomOf="@+id/editTextNombrePunto" />
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextM3"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:focusable="false"
+                    android:hint="M3"
+                    android:inputType="number"
+                    android:textColorHint="@color/colorPrimary"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/editTextAncho"
+                    app:layout_constraintTop_toBottomOf="@+id/editTextNombrePunto" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!--        todo final-->
 
             <TextView
                 android:id="@+id/textView3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="8dp"
                 android:text="Observación"
                 android:textColor="@color/colorPrimary"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView2" />
+                app:layout_constraintTop_toBottomOf="@+id/layoutReparacion" />
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editTextObservacion"
@@ -106,7 +176,6 @@
                 android:id="@+id/recyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-
                 android:layout_margin="8dp"
                 android:scrollbars="vertical"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -116,7 +185,6 @@
     </androidx.core.widget.NestedScrollView>
 
     <com.getbase.floatingactionbutton.FloatingActionsMenu
-        android:id="@+id/fab"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="end|bottom"

@@ -6,13 +6,10 @@ import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
+import android.content.Intent
 import android.graphics.*
-import android.location.Address
-import android.location.Geocoder
-import android.location.Location
 import android.net.Uri
 import android.os.Build
-import android.os.Environment
 import android.provider.MediaStore
 import android.provider.Settings
 import android.telephony.TelephonyManager
@@ -22,39 +19,33 @@ import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
-import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.exifinterface.media.ExifInterface
-import com.dsige.apptrinidad.R
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import io.reactivex.Completable
 import io.reactivex.Observable
-import io.reactivex.Observer
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 import java.io.*
 import java.nio.channels.FileChannel
-import java.text.DecimalFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.TimeUnit
-import kotlin.math.*
 
 object Util {
 
-    val FolderImg = "Dsige/Lds"
-    val UrlFoto = "http://www.dsige.com/webApiDsigeVehiculo/fotos/"
+    val FolderImg = "GoRelax/Galeria"
+    val UrlFoto = "http://www.dsige.com/webApiDemo/image/"
+    val UrlMovie = "http://www.dsige.com/webApiDemo/movie/"
 
     private var FechaActual: String? = ""
     private var date: Date? = null
 
     private const val img_height_default = 800
     private const val img_width_default = 600
+
 
     @SuppressLint("SimpleDateFormat")
     @Throws(ParseException::class)
@@ -95,6 +86,7 @@ object Util {
         return day
     }
 
+
     fun getFormatDate(date: Date): String {
         @SuppressLint("SimpleDateFormat") val format = SimpleDateFormat("dd/MM/yyyy HH:mm:ss a")
         return format.format(date)
@@ -104,18 +96,11 @@ object Util {
         date = Date()
         @SuppressLint("SimpleDateFormat") val format = SimpleDateFormat("dd/MM/yyyy")
         return format.format(date)
-//        return "05/10/2019"
-    }
-
-    fun getHora(): String {
-        date = Date()
-        @SuppressLint("SimpleDateFormat") val format = SimpleDateFormat("HH:mm aaa")
-        return format.format(date)
     }
 
     fun getFechaActual(): String {
         date = Date()
-        @SuppressLint("SimpleDateFormat") val format = SimpleDateFormat("dd/MM/yyyy HH:mm:ss")
+        @SuppressLint("SimpleDateFormat") val format = SimpleDateFormat("dd/MM/yyyy HH:mm:ss a")
         return format.format(date)
     }
 
@@ -132,7 +117,7 @@ object Util {
         return FechaActual
     }
 
-    fun getFechaActualForPhoto(tipo: Int): String {
+    fun getFechaActualForPhoto(tipo: String): String {
         val date = Date()
         @SuppressLint("SimpleDateFormat") val format = SimpleDateFormat("ddMMyyyy_HHmmssSSSS")
         FechaActual = format.format(date)
@@ -151,6 +136,7 @@ object Util {
         textInputLayout.isErrorEnabled = msg != null
     }
 
+
     // TODO SOBRE ADJUNTAR PHOTO
 
     @Throws(IOException::class)
@@ -167,17 +153,11 @@ object Util {
         destination.close()
     }
 
-    fun getRealPathFromURI(context: Context, contentUri: Uri): String? {
-        var result: String? = null
+    private fun getRealPathFromURI(context: Context, contentUri: Uri): String {
+        var result: String = ""
         val proj = arrayOf(MediaStore.Video.Media.DATA)
         @SuppressLint("Recycle") val cursor =
-            Objects.requireNonNull(context).contentResolver.query(
-                contentUri,
-                proj,
-                null,
-                null,
-                null
-            )
+            context.contentResolver.query(contentUri, proj, null, null, null)
         if (cursor != null) {
             val columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
             cursor.moveToFirst()
@@ -186,8 +166,8 @@ object Util {
         return result
     }
 
-    fun getFolder(): File {
-        val folder = File(Environment.getExternalStorageDirectory(), FolderImg)
+    fun getFolder(context: Context): File {
+        val folder = File(context.getExternalFilesDir(null)!!.absolutePath)
         if (!folder.exists()) {
             val success = folder.mkdirs()
             if (!success) {
@@ -197,8 +177,8 @@ object Util {
         return folder
     }
 
-    fun getFolderPhoto(): File {
-        val folder = File(Environment.getExternalStorageDirectory(), FolderImg)
+    fun getFolderPhoto(context: Context): File {
+        val folder = File(context.getExternalFilesDir(null)!!.absolutePath)
         if (!folder.exists()) {
             folder.mkdirs()
         }
@@ -213,6 +193,7 @@ object Util {
         }
     }
 
+
     private fun comprimirImagen(PathFile: String): Boolean {
         return try {
             val result = getRightAngleImage(PathFile)
@@ -223,7 +204,7 @@ object Util {
         }
     }
 
-    fun getDateTimeFormatString(date: Date): String {
+    private fun getDateTimeFormatString(date: Date): String {
         @SuppressLint("SimpleDateFormat") val df = SimpleDateFormat("dd/MM/yyyy - hh:mm:ss a")
         return df.format(date)
     }
@@ -234,7 +215,7 @@ object Util {
         return df.format(date)
     }
 
-    fun processingBitmapSetDateTime(bm1: Bitmap?, captionString: String?): Bitmap? {
+    private fun ProcessingBitmap_SetDATETIME(bm1: Bitmap?, captionString: String?): Bitmap? {
         //Bitmap bm1 = null;
         var newBitmap: Bitmap? = null
         try {
@@ -285,7 +266,9 @@ object Util {
         } catch (ex: IOException) {
             ex.message.toString()
         }
+
     }
+
 
     private fun shrinkBitmap(file: String, width: Int, height: Int): Bitmap {
 
@@ -293,8 +276,8 @@ object Util {
         options.inSampleSize = 4
         options.inJustDecodeBounds = true
 
-        val heightRatio = ceil((options.outHeight / height.toFloat()).toDouble()).toInt()
-        val widthRatio = ceil((options.outWidth / width.toFloat()).toDouble()).toInt()
+        val heightRatio = Math.ceil((options.outHeight / height.toFloat()).toDouble()).toInt()
+        val widthRatio = Math.ceil((options.outWidth / width.toFloat()).toDouble()).toInt()
 
         if (heightRatio > 1 || widthRatio > 1) {
             if (heightRatio > widthRatio) {
@@ -310,7 +293,8 @@ object Util {
 
     }
 
-    private fun shrinkBitmapOnlyReduce(
+
+    private fun ShrinkBitmapOnlyReduce(
         file: String,
         width: Int,
         height: Int,
@@ -321,8 +305,8 @@ object Util {
         options.inSampleSize = 4
         options.inJustDecodeBounds = true
 
-        val heightRatio = ceil((options.outHeight / height.toFloat()).toDouble()).toInt()
-        val widthRatio = ceil((options.outWidth / width.toFloat()).toDouble()).toInt()
+        val heightRatio = Math.ceil((options.outHeight / height.toFloat()).toDouble()).toInt()
+        val widthRatio = Math.ceil((options.outWidth / width.toFloat()).toDouble()).toInt()
 
         if (heightRatio > 1 || widthRatio > 1) {
             if (heightRatio > widthRatio) {
@@ -335,6 +319,7 @@ object Util {
         options.inJustDecodeBounds = false
 
         try {
+
 
             val b = BitmapFactory.decodeFile(file, options)
 
@@ -381,12 +366,12 @@ object Util {
         } catch (e: Exception) {
             e.printStackTrace()
         }
-    }
 
+    }
 
     // TODO SOBRE ROTAR LA PHOTO
 
-    fun getRightAngleImage(photoPath: String): String {
+    private fun getRightAngleImage(photoPath: String): String {
 
         try {
             val ei = ExifInterface(photoPath)
@@ -413,8 +398,9 @@ object Util {
     }
 
     private fun rotateImage(degree: Int, imagePath: String): String {
+
         if (degree <= 0) {
-            shrinkBitmapOnlyReduce(
+            ShrinkBitmapOnlyReduce(
                 imagePath,
                 img_width_default,
                 img_height_default,
@@ -429,7 +415,7 @@ object Util {
             if (b!!.width > b.height) {
                 matrix.setRotate(degree.toFloat())
                 b = Bitmap.createBitmap(b, 0, 0, b.width, b.height, matrix, true)
-                b = processingBitmapSetDateTime(
+                b = ProcessingBitmap_SetDATETIME(
                     b,
                     getDateTimeFormatString(Date(File(imagePath).lastModified()))
                 )
@@ -441,13 +427,13 @@ object Util {
 
             val out = FileOutputStream(imagePath)
             if (imageType.equals("png", ignoreCase = true)) {
-                b!!.compress(Bitmap.CompressFormat.PNG, 100, out)
+                b!!.compress(Bitmap.CompressFormat.PNG, 70, out)
             } else if (imageType.equals("jpeg", ignoreCase = true) || imageType.equals(
                     "jpg",
                     ignoreCase = true
                 )
             ) {
-                b!!.compress(Bitmap.CompressFormat.JPEG, 100, out)
+                b!!.compress(Bitmap.CompressFormat.JPEG, 70, out)
             }
             fOut.flush()
             fOut.close()
@@ -459,18 +445,269 @@ object Util {
         return imagePath
     }
 
-
-    fun putTextImage(file:String){
-
-//        val image:BufferedInputStream =
-//
-//         BufferedImage image = ImageIO.read(new URL( "http://upload.wikimedia.org/wikipedia/en/2/24/Lenna.png"));
-//
-//        val g =
-
-
+    fun getVersion(context: Context): String {
+        val pInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+        return pInfo.versionName
     }
 
+    @SuppressLint("HardwareIds", "MissingPermission")
+    fun getImei(context: Context): String {
+
+        val deviceUniqueIdentifier: String
+        val telephonyManager: TelephonyManager? =
+            context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        deviceUniqueIdentifier = if (telephonyManager != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                telephonyManager.imei
+            } else {
+                @Suppress("DEPRECATION")
+                telephonyManager.deviceId
+            }
+        } else {
+            Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
+        }
+        return deviceUniqueIdentifier
+    }
+
+    fun getToken(context: Context): String? {
+        return context.getSharedPreferences("TOKEN", MODE_PRIVATE).getString("token", "empty")
+    }
+
+    fun getNotificacionValid(context: Context): String? {
+        return context.getSharedPreferences("TOKEN", MODE_PRIVATE).getString("update", "")
+    }
+
+    fun updateNotificacionValid(context: Context) {
+        context.getSharedPreferences("TOKEN", MODE_PRIVATE).edit().putString("update", "").apply()
+    }
+
+    fun snackBarMensaje(view: View, mensaje: String) {
+        val mSnackbar = Snackbar.make(view, mensaje, Snackbar.LENGTH_SHORT)
+        mSnackbar.setAction("Ok") { mSnackbar.dismiss() }
+        mSnackbar.show()
+    }
+
+    fun toastMensaje(context: Context, mensaje: String) {
+        Toast.makeText(context, mensaje, Toast.LENGTH_LONG).show()
+    }
+
+    fun dialogMensaje(context: Context, title: String, mensaje: String) {
+        val dialog = MaterialAlertDialogBuilder(context)
+            .setTitle(title)
+            .setMessage(mensaje)
+            .setPositiveButton("Entendido") { dialog, _ ->
+                dialog.dismiss()
+            }
+        dialog.show()
+    }
+
+    // TODO CLOSE TECLADO
+
+
+    fun hideKeyboard(activity: Activity) {
+        // TODO FOR ACTIVITIES
+        val imm = activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        var view = activity.currentFocus
+        if (view == null) {
+            view = View(activity)
+        }
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
+    }
+
+    fun hideKeyboardFrom(context: Context, view: View) {
+        // TODO FOR FRAGMENTS
+        val imm = context.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
+    }
+
+    fun showKeyboard(edit: EditText, context: Context) {
+        edit.requestFocus()
+        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
+    }
+
+    fun getDateDialogText(context: Context, text: TextView) {
+        val c = Calendar.getInstance()
+        val mYear = c.get(Calendar.YEAR)
+        val mMonth = c.get(Calendar.MONTH)
+        val mDay = c.get(Calendar.DAY_OF_MONTH)
+        val datePickerDialog = DatePickerDialog(context, { _, year, monthOfYear, dayOfMonth ->
+            val month =
+                if (monthOfYear < 10) "0" + (monthOfYear + 1).toString() else (monthOfYear + 1).toString()
+            val day = if (dayOfMonth < 10) "0$dayOfMonth" else dayOfMonth.toString()
+            val fecha = "$day/$month/$year"
+            text.text = fecha
+        }, mYear, mMonth, mDay)
+        datePickerDialog.show()
+    }
+
+    fun getDateDialog(context: Context, input: TextInputEditText) {
+        val c = Calendar.getInstance()
+        val mYear = c.get(Calendar.YEAR)
+        val mMonth = c.get(Calendar.MONTH)
+        val mDay = c.get(Calendar.DAY_OF_MONTH)
+        val datePickerDialog = DatePickerDialog(context, { _, year, monthOfYear, dayOfMonth ->
+            val month =
+                if (monthOfYear < 10) "0" + (monthOfYear + 1).toString() else (monthOfYear + 1).toString()
+            val day = if (dayOfMonth < 10) "0$dayOfMonth" else dayOfMonth.toString()
+            val fecha = "$day/$month/$year"
+            input.setText(fecha)
+        }, mYear, mMonth, mDay)
+        datePickerDialog.show()
+    }
+
+    fun getHourDialog(context: Context, input: TextInputEditText) {
+        val c = Calendar.getInstance()
+        val mHour = c.get(Calendar.HOUR_OF_DAY)
+        val mMinute = c.get(Calendar.MINUTE)
+        val timePickerDialog =
+            TimePickerDialog(context, TimePickerDialog.OnTimeSetListener { _, hourOfDay, minute ->
+                val hour = if (hourOfDay < 10) "0$hourOfDay" else hourOfDay.toString()
+                val minutes = if (minute < 10) "0$minute" else minute.toString()
+                val day = if (hourOfDay < 12) "a.m." else "p.m."
+                input.setText(String.format("%s:%s %s", hour, minutes, day))
+            }, mHour, mMinute, false)
+        timePickerDialog.show()
+    }
+
+    private fun getCompareFecha(fechaInicial: String, fechaFinal: String): Boolean {
+
+        @SuppressLint("SimpleDateFormat") val format = SimpleDateFormat("dd/MM/yyyy")
+        var date1 = Date()
+        try {
+            date1 = format.parse(fechaFinal)
+        } catch (e: ParseException) {
+            e.printStackTrace()
+        }
+
+        var date2 = Date()
+        try {
+            date2 = format.parse(fechaInicial)
+        } catch (e: ParseException) {
+            e.printStackTrace()
+        }
+
+        return date1.before(date2)
+    }
+
+    fun getDateDialog(context: Context, view: View, input: TextInputEditText) {
+        val c = Calendar.getInstance()
+        val mYear = c.get(Calendar.YEAR)
+        val mMonth = c.get(Calendar.MONTH)
+        val mDay = c.get(Calendar.DAY_OF_MONTH)
+        val datePickerDialog = DatePickerDialog(context, { _, year, monthOfYear, dayOfMonth ->
+            val month =
+                if (monthOfYear < 10) "0" + (monthOfYear + 1).toString() else (monthOfYear + 1).toString()
+            val day = if (dayOfMonth < 10) "0$dayOfMonth" else dayOfMonth.toString()
+            val fecha = "$day/$month/$year"
+
+            if (!getCompareFecha(getFecha(), fecha)) {
+                input.setText(fecha)
+            } else {
+                snackBarMensaje(view, "Fecha Propuesta no debe ser menor a la fecha actual")
+            }
+
+        }, mYear, mMonth, mDay)
+        datePickerDialog.show()
+    }
+
+
+    fun getTextHTML(html: String): Spanned {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Html.fromHtml(html, Html.FROM_HTML_OPTION_USE_CSS_COLORS)
+        } else {
+            @Suppress("DEPRECATION")
+            Html.fromHtml(html)
+        }
+    }
+
+    fun isNumeric(strNum: String): Boolean {
+        try {
+            val d = Integer.parseInt(strNum)
+            Log.i("TAG", d.toString())
+        } catch (nfe: NumberFormatException) {
+            return false
+        } catch (nfe: NullPointerException) {
+            return false
+        }
+        return true
+    }
+
+    fun isDecimal(s: String): Boolean {
+        try {
+            val d = s.toDouble()
+            Log.i("TAG", d.toString())
+        } catch (nfe: NumberFormatException) {
+            return false
+        } catch (nfe: NullPointerException) {
+            return false
+        }
+        return true
+    }
+
+    fun callNumber(number: String, context: Context) {
+        val intent = Intent(Intent.ACTION_DIAL)
+        intent.data = Uri.parse(String.format("tel:%s", number))
+        context.startActivity(intent)
+    }
+
+    fun sendMessageWhatsapp(number: String, name: String, context: Context) {
+        val message =
+            "Hola $name \n\n te eh visto en Go Relax y me gustaria tener un encuentro contigo."
+        context.startActivity(
+            Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse(
+                    String.format(
+                        "https://api.whatsapp.com/send?phone=%s&text=%s",
+                        number, message
+                    )
+                )
+            )
+        )
+    }
+
+    fun getFolderAdjunto(
+        file: String, context: Context, data: Intent
+    ): Completable {
+        return Completable.fromAction {
+            val imagepath = getFolder(context).toString() + "/" + file
+            val f = File(imagepath)
+            if (!f.exists()) {
+                try {
+                    val success = f.createNewFile()
+                    if (success) {
+                        Log.i("TAG", "FILE CREATED")
+                    }
+                    copyFile(File(getRealPathFromURI(context, data.data!!)), f)
+                    comprimirImagen(imagepath)
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+            }
+        }
+    }
+
+    @Throws(IOException::class)
+    fun deleteDirectory(file: File) {
+        if (file.isDirectory) {
+            val l: Array<File>? = file.listFiles()
+            if (l != null) {
+                for (ct: File in l) {
+                    ct.delete()
+                }
+            }
+        }
+    }
+
+    fun deleteImage(name: String, context: Context) {
+        val f: File? = File(context.getExternalFilesDir(null)!!.absolutePath + "/" + name)
+        if (f != null) {
+            if (f.exists()) {
+                f.delete()
+            }
+        }
+    }
 
     fun getAngleImage(photoPath: String): String {
         try {
@@ -581,279 +818,38 @@ object Util {
         newBitmap.recycle()
     }
 
-    fun getVersion(context: Context): String {
-        val pInfo = context.packageManager.getPackageInfo(context.packageName, 0)
-        return pInfo.versionName
-    }
-
-    @SuppressLint("HardwareIds", "MissingPermission")
-    fun getImei(context: Context): String {
-        val deviceUniqueIdentifier: String
-        val telephonyManager: TelephonyManager? =
-            context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-        deviceUniqueIdentifier = if (telephonyManager != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                telephonyManager.imei
-            } else {
-                @Suppress("DEPRECATION")
-                telephonyManager.deviceId
-            }
-        } else {
-            Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
-        }
-        return deviceUniqueIdentifier
-    }
-
-    fun getToken(context: Context): String? {
-        return context.getSharedPreferences("TOKEN", MODE_PRIVATE).getString("token", "empty")
-    }
-
-    fun getNotificacionValid(context: Context): String? {
-        return context.getSharedPreferences("TOKEN", MODE_PRIVATE).getString("update", "")
-    }
-
-    fun updateNotificacionValid(context: Context) {
-        context.getSharedPreferences("TOKEN", MODE_PRIVATE).edit().putString("update", "").apply()
-    }
-
-    fun snackBarMensaje(view: View, mensaje: String) {
-        val mSnackbar = Snackbar.make(view, mensaje, Snackbar.LENGTH_SHORT)
-        mSnackbar.setAction("Ok") { mSnackbar.dismiss() }
-        mSnackbar.show()
-    }
-
-    fun toastMensaje(context: Context, mensaje: String) {
-        Toast.makeText(context, mensaje, Toast.LENGTH_LONG).show()
-    }
-
-    fun dialogMensaje(context: Context, title: String, mensaje: String) {
-        val dialog = MaterialAlertDialogBuilder(context)
-            .setTitle(title)
-            .setMessage(mensaje)
-            .setPositiveButton("Entendido") { dialog, _ ->
-                dialog.dismiss()
-            }
-        dialog.show()
-    }
-
-    // TODO CLOSE TECLADO
-
-    fun hideKeyboard(activity: Activity) {
-        val view = activity.currentFocus
-        if (view != null) {
-            val imm = activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.hideSoftInputFromWindow(view.windowToken, 0)
-        }
-    }
-
-    fun showKeyboard(edit: EditText, context: Context) {
-        edit.requestFocus()
-        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
-    }
-
-    fun hideKeyboardFrom(context: Context, view: View) {
-        // TODO FOR FRAGMENTS
-        val imm = context.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(view.windowToken, 0)
-    }
-
-    fun getDateDialogText(context: Context, text: TextView) {
-        val c = Calendar.getInstance()
-        val mYear = c.get(Calendar.YEAR)
-        val mMonth = c.get(Calendar.MONTH)
-        val mDay = c.get(Calendar.DAY_OF_MONTH)
-        val datePickerDialog = DatePickerDialog(context, { _, year, monthOfYear, dayOfMonth ->
-            val month =
-                if (((monthOfYear + 1) / 10) == 0) "0" + (monthOfYear + 1).toString() else (monthOfYear + 1).toString()
-            val day = if (((dayOfMonth + 1) / 10) == 0) "0$dayOfMonth" else dayOfMonth.toString()
-            val fecha = "$day/$month/$year"
-            text.text = fecha
-        }, mYear, mMonth, mDay)
-        datePickerDialog.show()
-    }
-
-    fun getDateDialog(context: Context, input: TextInputEditText) {
-        val c = Calendar.getInstance()
-        val mYear = c.get(Calendar.YEAR)
-        val mMonth = c.get(Calendar.MONTH)
-        val mDay = c.get(Calendar.DAY_OF_MONTH)
-        val datePickerDialog = DatePickerDialog(context, { _, year, monthOfYear, dayOfMonth ->
-            val month =
-                if (((monthOfYear + 1) / 10) == 0) "0" + (monthOfYear + 1).toString() else (monthOfYear + 1).toString()
-            val day = if (((dayOfMonth + 1) / 10) == 0) "0$dayOfMonth" else dayOfMonth.toString()
-            val fecha = "$day/$month/$year"
-            input.setText(fecha)
-        }, mYear, mMonth, mDay)
-        datePickerDialog.show()
-    }
-
-    fun getHourDialog(context: Context, input: TextInputEditText) {
-        val c = Calendar.getInstance()
-        val mHour = c.get(Calendar.HOUR_OF_DAY)
-        val mMinute = c.get(Calendar.MINUTE)
-        val timePickerDialog =
-            TimePickerDialog(context, TimePickerDialog.OnTimeSetListener { _, hourOfDay, minute ->
-                val hour = if (hourOfDay < 10) "0$hourOfDay" else hourOfDay.toString()
-                val minutes = if (minute < 10) "0$minute" else minute.toString()
-                val day = if (hourOfDay < 12) "a.m." else "p.m."
-                input.setText(String.format("%s:%s %s", hour, minutes, day))
-            }, mHour, mMinute, false)
-        timePickerDialog.show()
-    }
-
-    private fun getCompareFecha(fechaInicial: String, fechaFinal: String): Boolean {
-        @SuppressLint("SimpleDateFormat") val format = SimpleDateFormat("dd/MM/yyyy")
-        var date1 = Date()
+    fun processingBitmapSetDateTime(bm1: Bitmap?, captionString: String?): Bitmap? {
+        //Bitmap bm1 = null;
+        var newBitmap: Bitmap? = null
         try {
-            date1 = format.parse(fechaFinal)
-        } catch (e: ParseException) {
+
+            var config: Bitmap.Config? = bm1!!.config
+            if (config == null) {
+                config = Bitmap.Config.ARGB_8888
+            }
+            newBitmap = Bitmap.createBitmap(bm1.width, bm1.height, config)
+
+            val newCanvas = Canvas(newBitmap!!)
+            newCanvas.drawBitmap(bm1, 0f, 0f, null)
+
+            if (captionString != null) {
+
+                val paintText = Paint(Paint.ANTI_ALIAS_FLAG)
+                paintText.color = Color.RED
+                paintText.textSize = 22f
+                paintText.style = Paint.Style.FILL
+                paintText.setShadowLayer(0.7f, 0.7f, 0.7f, Color.YELLOW)
+
+                val rectText = Rect()
+                paintText.getTextBounds(captionString, 0, captionString.length, rectText)
+                newCanvas.drawText(captionString, 0f, rectText.height().toFloat(), paintText)
+            }
+
+            //} catch (FileNotFoundException e) {
+        } catch (e: Exception) {
             e.printStackTrace()
         }
 
-        var date2 = Date()
-        try {
-            date2 = format.parse(fechaInicial)
-        } catch (e: ParseException) {
-            e.printStackTrace()
-        }
-
-        return date1.before(date2)
+        return newBitmap
     }
-
-    fun getDateDialog(context: Context, view: View, input: TextInputEditText) {
-        val c = Calendar.getInstance()
-        val mYear = c.get(Calendar.YEAR)
-        val mMonth = c.get(Calendar.MONTH)
-        val mDay = c.get(Calendar.DAY_OF_MONTH)
-        val datePickerDialog = DatePickerDialog(context, { _, year, monthOfYear, dayOfMonth ->
-            val month =
-                if (((monthOfYear + 1) / 10) == 0) "0" + (monthOfYear + 1).toString() else (monthOfYear + 1).toString()
-            val day = if (((dayOfMonth + 1) / 10) == 0) "0$dayOfMonth" else dayOfMonth.toString()
-            val fecha = "$day/$month/$year"
-
-            if (!getCompareFecha(getFecha(), fecha)) {
-                input.setText(fecha)
-            } else {
-                snackBarMensaje(view, "Fecha Propuesta no debe ser menor a la fecha actual")
-            }
-
-        }, mYear, mMonth, mDay)
-        datePickerDialog.show()
-    }
-
-    fun getTextHTML(html: String): Spanned {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            Html.fromHtml(html, Html.FROM_HTML_OPTION_USE_CSS_COLORS)
-        } else {
-            @Suppress("DEPRECATION")
-            Html.fromHtml(html)
-        }
-    }
-
-    fun isNumber(n: Double): Boolean {
-        val valor = n.toString()
-        return if (valor.length == 3) {
-            val a = valor.substring(valor.length - 1)
-            a == "0"
-        } else {
-            false
-        }
-    }
-
-    fun isNumeric(strNum: String): Boolean {
-        try {
-            val d = Integer.parseInt(strNum)
-            Log.i("TAG", d.toString())
-        } catch (nfe: NumberFormatException) {
-            return false
-        } catch (nfe: NullPointerException) {
-            return false
-        }
-        return true
-    }
-
-    fun isDecimal(s: String): Boolean {
-        try {
-            val d = s.toDouble()
-            Log.i("TAG", d.toString())
-        } catch (nfe: NumberFormatException) {
-            return false
-        } catch (nfe: NullPointerException) {
-            return false
-        }
-        return true
-    }
-
-    @Throws(IOException::class)
-    fun deleteDirectory(file: File) {
-        if (file.isDirectory) {
-            for (ct: File in file.listFiles()) {
-                ct.delete()
-            }
-        }
-    }
-
-    fun getLocationName(
-        context: Context,
-        input: TextInputEditText,
-        location: Location,
-        progressBar: ProgressBar
-    ) {
-        val nombre = arrayOf("")
-        try {
-            val addressObservable = Observable.just(
-                Geocoder(context).getFromLocation(
-                    location.latitude,
-                    location.longitude,
-                    1
-                )[0]
-            )
-            addressObservable.subscribeOn(Schedulers.io())
-                .delay(1000, TimeUnit.MILLISECONDS)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Observer<Address> {
-                    override fun onSubscribe(d: Disposable) {
-
-                    }
-
-                    override fun onNext(address: Address) {
-                        nombre[0] = address.getAddressLine(0)
-                    }
-
-                    override fun onError(e: Throwable) {
-                        toastMensaje(context, context.getString(R.string.try_again))
-                        progressBar.visibility = View.GONE
-                    }
-
-                    override fun onComplete() {
-                        input.setText(nombre[0])
-                        progressBar.visibility = View.GONE
-                    }
-                })
-        } catch (e: IOException) {
-            toastMensaje(context, e.toString())
-            progressBar.visibility = View.GONE
-        }
-    }
-
-    fun calculationByDistance(StartP: Location, EndP: Location): Double {
-        val radius = 6371 * 1000  // radius of earth in Km * meters
-        val lat1 = StartP.latitude
-        val lat2 = EndP.latitude
-        val lon1 = StartP.longitude
-        val lon2 = EndP.longitude
-        val dLat = Math.toRadians(lat2 - lat1)
-        val dLon = Math.toRadians(lon2 - lon1)
-        val a = sin(dLat / 2) * sin(dLat / 2) + (cos(Math.toRadians(lat1))
-                * cos(Math.toRadians(lat2)) * sin(dLon / 2)
-                * sin(dLon / 2))
-        val c = 2 * asin(sqrt(a))
-        val valueResult = radius * c
-        val km = valueResult / 1
-        val newFormat = DecimalFormat("####")
-        val kmInDec = Integer.valueOf(newFormat.format(km))
-        return kmInDec.toDouble()
-    }
-
 }

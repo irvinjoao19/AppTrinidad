@@ -11,11 +11,11 @@ import com.dsige.apptrinidad.data.local.model.*
     entities = [
         Usuario::class,
         Registro::class,
-        RegistroPhoto::class,
+        RegistroDetalle::class,
         Servicio::class,
         Parametro::class
     ],
-    version = 1,
+    version = 8,
     exportSchema = false
 )
 abstract class AppDataBase : RoomDatabase() {
@@ -23,7 +23,7 @@ abstract class AppDataBase : RoomDatabase() {
     abstract fun usuarioDao(): UsuarioDao
     abstract fun parametroDao(): ParametroDao
     abstract fun registroDao(): RegistroDao
-    abstract fun registroPhotoDao(): RegistroPhotoDao
+    abstract fun registroDetalleDao(): RegistroDetalleDao
     abstract fun servicioDao(): ServicioDao
 
     companion object {

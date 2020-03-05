@@ -1,4 +1,4 @@
-package com.dsige.lecturalds.data.local
+package com.dsige.apptrinidad.data.local
 
 open class Converts {
 

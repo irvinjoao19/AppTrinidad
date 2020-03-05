@@ -34,8 +34,7 @@ class MainActivity : DaggerAppCompatActivity(), NavigationView.OnNavigationItemS
     lateinit var usuarioViewModel: UsuarioViewModel
     lateinit var builder: AlertDialog.Builder
     var dialog: AlertDialog? = null
-    var usuarioId: Int = 1
-    var anuncioId: Int = 0
+    var usuarioId: String = ""
     var logout: String = "off"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,8 +46,8 @@ class MainActivity : DaggerAppCompatActivity(), NavigationView.OnNavigationItemS
     private fun bindUI() {
         usuarioViewModel =
             ViewModelProvider(this, viewModelFactory).get(UsuarioViewModel::class.java)
-//        usuarioViewModel.user.observe(this, Observer<Usuario> { u ->
-//            if (u != null) {
+        usuarioViewModel.user.observe(this, Observer<Usuario> { u ->
+            if (u != null) {
                 setSupportActionBar(toolbar)
                 val toggle = ActionBarDrawerToggle(
                     this@MainActivity,
@@ -60,14 +59,13 @@ class MainActivity : DaggerAppCompatActivity(), NavigationView.OnNavigationItemS
                 drawerLayout.addDrawerListener(toggle)
                 toggle.syncState()
                 navigationView.setNavigationItemSelectedListener(this@MainActivity)
-                navigationView.menu.getItem(0).isVisible = true
-//                getUser(null)
+                getUser(u)
                 fragmentByDefault()
                 message()
-//            } else {
-//                goLogin()
-//            }
-//        })
+            } else {
+                goLogin()
+            }
+        })
     }
 
     override fun onBackPressed() {
@@ -80,16 +78,14 @@ class MainActivity : DaggerAppCompatActivity(), NavigationView.OnNavigationItemS
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-
-//            R.id.list -> changeFragment(
-//                AdminAnunciosFragment.newInstance(usuarioId),
-//                "Mis Anuncios"
-//            )
-//            R.id.publish -> goActivity(
-//                Intent(
-//                    this, PublishActivity::class.java
-//                ).putExtra("usuarioId", usuarioId).putExtra("anuncioId", anuncioId)
-//            )
+            R.id.reparacion -> changeFragment(
+                MainFragment.newInstance(1, usuarioId),
+                "Reparación de Veredas"
+            )
+            R.id.trabajo -> changeFragment(
+                MainFragment.newInstance(2, usuarioId),
+                "Trabajos SS"
+            )
             R.id.logout -> dialogLogout()
         }
         drawerLayout.closeDrawer(GravityCompat.START)
@@ -118,23 +114,23 @@ class MainActivity : DaggerAppCompatActivity(), NavigationView.OnNavigationItemS
             .beginTransaction()
             .replace(R.id.content_frame, fragment)
             .commit()
-//        supportActionBar!!.title = title
+        supportActionBar!!.title = title
     }
 
     private fun fragmentByDefault() {
         supportFragmentManager
             .beginTransaction()
-            .replace(R.id.content_frame, MainFragment.newInstance("",""))
+            .replace(R.id.content_frame, MainFragment.newInstance(1, usuarioId))
             .commit()
-        supportActionBar!!.title = "Mis Anuncios"
-        navigationView.menu.getItem(0).isChecked = true
+        supportActionBar!!.title = "Reparación de Veredas"
+        navigationView.menu.getItem(1).isChecked = true
     }
 
     private fun getUser(u: Usuario) {
         val header = navigationView.getHeaderView(0)
         header.textViewName.text = u.nombre
-        header.textViewEmail.text = "irvin.dsige@gmail.com"
-        usuarioId = u.operarioId
+        header.textViewEmail.text = String.format("Cod : %s", u.usuarioId)
+        usuarioId = u.usuarioId
     }
 
     private fun goLogin() {

@@ -1,6 +1,8 @@
 package com.dsige.apptrinidad.data.local.repository
 
+import android.content.Context
 import androidx.lifecycle.LiveData
+import androidx.paging.PagedList
 import com.dsige.apptrinidad.data.local.model.*
 import com.dsige.apptrinidad.helper.Mensaje
 import io.reactivex.Completable
@@ -12,11 +14,9 @@ interface AppRepository {
 
     fun getUsuario(): LiveData<Usuario>
 
-    fun getUsuarioId(): LiveData<Int>
+    fun getUsuarioId(): LiveData<String>
 
-    fun getUsuarioIdTask(): Int
-
-    fun getUsuarioActive(): Observable<Int>
+    fun getUsuarioIdTask(): String
 
     fun getUsuarioService(
         usuario: String,
@@ -45,7 +45,7 @@ interface AppRepository {
 
     fun verification(body: RequestBody): Observable<String>
 
-    fun verificateInspecciones(id:Int,fecha:String) : Observable<Mensaje>
+    fun verificateInspecciones(id: Int, fecha: String): Observable<Mensaje>
 
     fun saveInspection(body: RequestBody): Observable<Mensaje>
 
@@ -61,7 +61,7 @@ interface AppRepository {
 
     fun updateRegistro(m: Mensaje): Completable
 
-    fun getDataRegistro(estado : Int): Observable<List<Registro>>
+    fun getDataRegistro(estado: Int): Observable<List<Registro>>
 
     // TODO SERVICIOS
 
@@ -69,19 +69,29 @@ interface AppRepository {
 
     // TODO REGISTRO
 
-    fun getRegistroBySuministro(suministroId: Int): LiveData<Registro>
+    fun insertOrUpdateRegistro(r: Registro,id:Int): Completable
 
-    fun getRegistroBySuministroTask(suministroId: Int): Observable<Registro>
+    fun insertOrUpdateRegistroPhoto(p: RegistroDetalle): Completable
 
-    fun getSizeRegistroByTipo(id: Int): LiveData<Int>
+    fun getIdentity(): LiveData<Int>
 
-    fun getSizeRegistroByTipoRx(id: Int): Observable<Int>
+    fun getRegistroPhotoById(id: Int): LiveData<PagedList<RegistroDetalle>>
 
-    fun getAllRegistroVerificate(valor: Int): LiveData<Int>
+    fun getRegistroById(id: Int): LiveData<Registro>
 
-    fun insertRegistro(id: Int): Completable
+    fun deleteGaleria(d: MenuPrincipal, c: Context): Completable
 
-    fun insertOrUpdateRegistro(r: Registro, type: Int): Completable
+    fun getRegistroByTipo(tipo: Int): LiveData<List<Registro>>
 
-    fun insertOrUpdateRegistroPhoto(p: RegistroPhoto): Completable
+    fun getRegistroPagingByTipo(tipo: Int): LiveData<PagedList<Registro>>
+
+    fun getRegistroByObra(o: String): LiveData<List<Registro>>
+
+    fun getDetalleIdentity() : LiveData<Int>
+
+    fun updatePhoto(tipo:Int,name:String,id:Int) : Completable
+
+    fun getRegistroDetalle(id: Int): LiveData<RegistroDetalle>
+
+    fun getRegistroDetalleById(id: Int): LiveData<List<RegistroDetalle>>
 }

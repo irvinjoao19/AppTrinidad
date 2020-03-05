@@ -22,21 +22,14 @@ interface UsuarioDao {
     @Query("SELECT * FROM Usuario")
     fun getUsuario(): LiveData<Usuario>
 
-    @Query("SELECT operarioId FROM Usuario")
-    fun getUsuarioId(): LiveData<Int>
+    @Query("SELECT usuarioId FROM Usuario")
+    fun getUsuarioId(): LiveData<String>
 
-    @Query("SELECT operarioId FROM Usuario")
-    fun getUsuarioIdTask(): Int
+    @Query("SELECT usuarioId FROM Usuario")
+    fun getUsuarioIdTask(): String
 
-    @Query("SELECT activeInspeccion FROM Usuario")
-    fun getUsuarioActive(): Int
-
-    @Query("SELECT * FROM Usuario WHERE operarioId =:id")
-    fun getUsuarioById(id: Int): LiveData<Usuario>
-
-    @Query("UPDATE Usuario SET activeInspeccion=:estado")
-    fun updateActiveInspeccion(estado: Int)
-
+    @Query("SELECT * FROM Usuario WHERE usuarioId =:id")
+    fun getUsuarioById(id: String): LiveData<Usuario>
 
     @Query("DELETE FROM Usuario")
     fun deleteAll()

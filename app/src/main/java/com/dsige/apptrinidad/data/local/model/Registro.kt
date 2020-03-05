@@ -6,30 +6,21 @@ import androidx.room.PrimaryKey
 
 @Entity
 open class Registro {
-
     @PrimaryKey(autoGenerate = true)
     var registroId: Int = 0
-    var suministroId: Int = 0
-    var tipoLectura: Int = 0
-    var registroFecha: String = ""
+    var tipo: Int = 0
+    var nroObra: String = ""
+    var nroPoste: String = ""
+    var foto: String = ""
     var latitud: String = ""
     var longitud: String = ""
-    var registroLectura: String = ""
-    var registroConfirmarLectura: String = ""
-    var observacion: String = ""
-    var grupoIncidenciaCodigo: String = ""
-    var registroDns: String = ""
-    var registroUbicacion: String = ""
-    var registroTieneFoto: String = ""
-    var generalId: String = ""
-    var operarioId: Int = 0
-    var fechaSincronizacion: String = ""
-    var registroTipoProceso: String = ""
-    var registroConstancia: String = ""
-    var registroMedidor: String = ""
-    var flagRecepcion: String = ""
-    var registroSuministro: String = ""
-    var estado: Int = 0
+    var usuarioId: String = ""
+    var estado: String = ""
+    var fecha: String = ""
+    var active: Int = 0
+
+    var punto: String = ""
+
     @Ignore
-    var photos: List<RegistroPhoto>? = null
+    var detalles: RegistroDetalle? = null
 }

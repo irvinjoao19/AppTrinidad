@@ -19,4 +19,10 @@ abstract class ActivityBindingModule {
 
     @ContributesAndroidInjector
     internal abstract fun bindPreviewCameraActivity(): PreviewCameraActivity
+
+    @ContributesAndroidInjector
+    internal abstract fun bindRegistroActivity(): RegistroActivity
+
+    @ContributesAndroidInjector
+    internal abstract fun bindDetailActivity(): DetailActivity
 }
