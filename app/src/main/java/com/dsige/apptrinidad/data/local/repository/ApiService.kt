@@ -19,7 +19,7 @@ interface ApiService {
     fun getSync(@Query("operarioId") operarioId: Int, @Query("version") version: String ): Observable<Sync>
 
     @Headers("Cache-Control: no-cache")
-    @POST("Save")
+    @POST("SaveRegistro")
     fun save(@Body body: RequestBody): Observable<Mensaje>
 
     @Headers("Cache-Control: no-cache")

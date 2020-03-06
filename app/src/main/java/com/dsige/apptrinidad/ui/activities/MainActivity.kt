@@ -87,6 +87,10 @@ class MainActivity : DaggerAppCompatActivity(), NavigationView.OnNavigationItemS
                 "Trabajos SS"
             )
             R.id.logout -> dialogLogout()
+            R.id.envio -> {
+                load("Enviando")
+                usuarioViewModel.sendData(this)
+            }
         }
         drawerLayout.closeDrawer(GravityCompat.START)
         return true
@@ -96,13 +100,13 @@ class MainActivity : DaggerAppCompatActivity(), NavigationView.OnNavigationItemS
         startActivity(i)
     }
 
-    private fun load() {
+    private fun load(title: String) {
         builder = AlertDialog.Builder(ContextThemeWrapper(this@MainActivity, R.style.AppTheme))
         @SuppressLint("InflateParams") val view =
             LayoutInflater.from(this@MainActivity).inflate(R.layout.dialog_login, null)
         builder.setView(view)
-        val textViewTitle: TextView = view.findViewById(R.id.textViewLado)
-        textViewTitle.text = String.format("%s", "Cerrando Sesión")
+        val textViewTitle: TextView = view.findViewById(R.id.textView)
+        textViewTitle.text = title
         dialog = builder.create()
         dialog!!.setCanceledOnTouchOutside(false)
         dialog!!.setCancelable(false)
@@ -142,28 +146,30 @@ class MainActivity : DaggerAppCompatActivity(), NavigationView.OnNavigationItemS
         }
     }
 
+    private fun closeLoad(){
+        if (dialog != null) {
+            if (dialog!!.isShowing) {
+                dialog!!.dismiss()
+            }
+        }
+    }
+
     private fun message() {
         usuarioViewModel.success.observe(this, Observer<String> { s ->
             if (s != null) {
-                if (dialog != null) {
-                    if (dialog!!.isShowing) {
-                        dialog!!.dismiss()
-                    }
-                }
+                closeLoad()
                 if (s == "Close") {
                     val intent = Intent(this@MainActivity, LoginActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(intent)
+                }else{
+                    Util.toastMensaje(this,s)
                 }
             }
         })
         usuarioViewModel.error.observe(this@MainActivity, Observer<String> { s ->
             if (s != null) {
-                if (dialog != null) {
-                    if (dialog!!.isShowing) {
-                        dialog!!.dismiss()
-                    }
-                }
+                closeLoad()
                 Util.snackBarMensaje(window.decorView, s)
             }
         })
@@ -176,7 +182,7 @@ class MainActivity : DaggerAppCompatActivity(), NavigationView.OnNavigationItemS
             .setMessage("Deseas Salir ?")
             .setPositiveButton("SI") { dialog, _ ->
                 logout = "on"
-                load()
+                load("Cerrando Session")
                 usuarioViewModel.logout()
                 dialog.dismiss()
             }

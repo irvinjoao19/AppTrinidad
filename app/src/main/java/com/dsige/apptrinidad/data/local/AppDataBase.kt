@@ -15,7 +15,7 @@ import com.dsige.apptrinidad.data.local.model.*
         Servicio::class,
         Parametro::class
     ],
-    version = 8,
+    version = 9,
     exportSchema = false
 )
 abstract class AppDataBase : RoomDatabase() {
@@ -31,7 +31,6 @@ abstract class AppDataBase : RoomDatabase() {
         var INSTANCE: AppDataBase? = null
         val DB_NAME = "lds_db"
     }
-
 
     fun getDatabase(context: Context): AppDataBase {
         if (INSTANCE == null) {

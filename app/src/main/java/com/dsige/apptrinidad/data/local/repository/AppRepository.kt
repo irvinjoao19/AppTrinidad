@@ -89,9 +89,9 @@ interface AppRepository {
 
     fun getDetalleIdentity() : LiveData<Int>
 
-    fun updatePhoto(tipo:Int,name:String,id:Int) : Completable
+    fun updatePhoto(tipo:Int,name:String,detalleId:Int,id:Int) : Completable
 
-    fun getRegistroDetalle(id: Int): LiveData<RegistroDetalle>
+    fun getRegistroDetalle(tipo:Int,id: Int): LiveData<RegistroDetalle>
 
     fun getRegistroDetalleById(id: Int): LiveData<List<RegistroDetalle>>
 }

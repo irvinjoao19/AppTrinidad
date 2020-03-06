@@ -153,10 +153,10 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
     override fun getDataRegistro(estado: Int): Observable<List<Registro>> {
         return Observable.create { emitter ->
             val list: ArrayList<Registro> = ArrayList()
-            val v: List<Registro> = dataBase.registroDao().getAllRegistroTask(1)
+            val v: List<Registro> = dataBase.registroDao().getAllRegistroTask(estado)
             for (r: Registro in v) {
-//                val photos = dataBase.registroDetalleDao().getAllRegistroPhotoTask(r.registroId)
-//                r.detalles = photos
+                val detalle = dataBase.registroDetalleDao().getAllRegistroDetalleTask(r.registroId)
+                r.list = detalle
                 list.add(r)
             }
             emitter.onNext(list)
@@ -181,11 +181,23 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
 
     override fun insertOrUpdateRegistro(r: Registro, id: Int): Completable {
         return Completable.fromAction {
-            if (id == 0) {
-                dataBase.registroDao().insertRegistroTask(r)
-                val identity = dataBase.registroDao().getTaskIdentity()
-                r.detalles!!.registroId = identity
-                dataBase.registroDetalleDao().insertRegistroPhotoTask(r.detalles!!)
+            if (r.registroId == 0) {
+                if (id == 0) {
+                    dataBase.registroDao().insertRegistroTask(r)
+                    val identity = dataBase.registroDao().getTaskIdentity()
+                    r.detalles!!.registroId = identity
+                    dataBase.registroDetalleDao().insertRegistroPhotoTask(r.detalles!!)
+                } else {
+                    dataBase.registroDetalleDao()
+                        .updateObservacion(r.detalles!!.detalleId, r.detalles!!.observacion)
+                }
+            } else {
+                if (r.tipo == 1) {
+                    if (id == 0) {
+                        r.detalles!!.registroId = r.registroId
+                        dataBase.registroDetalleDao().insertRegistroPhotoTask(r.detalles!!)
+                    }
+                }
             }
         }
     }
@@ -248,28 +260,40 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         return dataBase.registroDetalleDao().getIdentity()
     }
 
-    override fun updatePhoto(tipo: Int, name: String, id: Int): Completable {
+    override fun updatePhoto(tipo: Int, name: String, detalleId: Int, id: Int): Completable {
         return Completable.fromAction {
-            val d: RegistroDetalle = dataBase.registroDetalleDao().getRegistroDetalleById(id)
-            if (tipo == 1) {
-                when {
-                    d.foto1PuntoAntes.isEmpty() -> d.foto1PuntoAntes = name
-                    d.foto2PuntoAntes.isEmpty() -> d.foto2PuntoAntes = name
-                    else -> d.foto3PuntoAntes = name
+            when (tipo) {
+                1 -> {
+                    val d: RegistroDetalle =
+                        dataBase.registroDetalleDao().getRegistroDetalleById(detalleId)
+                    when {
+                        d.foto1PuntoAntes.isEmpty() -> d.foto1PuntoAntes = name
+                        d.foto2PuntoAntes.isEmpty() -> d.foto2PuntoAntes = name
+                        else -> d.foto3PuntoAntes = name
+                    }
+                    dataBase.registroDetalleDao().updateRegistroPhotoTask(d)
                 }
-            } else {
-                when {
-                    d.foto1PuntoDespues.isEmpty() -> d.foto1PuntoDespues = name
-                    d.foto2PuntoDespues.isEmpty() -> d.foto2PuntoDespues = name
-                    else -> d.foto3PuntoDespues = name
+                2 -> {
+                    val d: RegistroDetalle =
+                        dataBase.registroDetalleDao().getRegistroDetalleById(detalleId)
+                    when {
+                        d.foto1PuntoDespues.isEmpty() -> d.foto1PuntoDespues = name
+                        d.foto2PuntoDespues.isEmpty() -> d.foto2PuntoDespues = name
+                        else -> d.foto3PuntoDespues = name
+                    }
+                    dataBase.registroDetalleDao().updateRegistroPhotoTask(d)
                 }
+                else -> dataBase.registroDao().updatePhoto(id, name)
             }
-            dataBase.registroDetalleDao().updateRegistroPhotoTask(d)
         }
     }
 
-    override fun getRegistroDetalle(id: Int): LiveData<RegistroDetalle> {
-        return dataBase.registroDetalleDao().getRegistroDetalle(id)
+    override fun getRegistroDetalle(tipo: Int, id: Int): LiveData<RegistroDetalle> {
+        return if (tipo == 1) {
+            dataBase.registroDetalleDao().getRegistroDetalle(id)
+        } else {
+            dataBase.registroDetalleDao().getRegistroDetalleFk(id)
+        }
     }
 
     override fun getRegistroDetalleById(id: Int): LiveData<List<RegistroDetalle>> {

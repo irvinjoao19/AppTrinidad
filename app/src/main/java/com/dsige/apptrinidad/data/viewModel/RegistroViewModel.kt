@@ -59,7 +59,7 @@ internal constructor(private val roomRepository: AppRepository) :
         return lectura.toDouble() - anterior.toDouble()
     }
 
-    fun validateRegistro(r: Registro,id:Int) {
+    fun validateRegistro(r: Registro, id: Int, tipo: String) {
 
         if (r.nroObra.isEmpty()) {
             mensajeError.value = "Digitar Obra"
@@ -71,35 +71,34 @@ internal constructor(private val roomRepository: AppRepository) :
             return
         }
 
-        if (r.detalles!!.nombrePunto.isEmpty()) {
-            mensajeError.value = "Digitar Nombre de Punto"
-            return
+        if (r.tipo == 1) {
+            if (r.detalles!!.nombrePunto.isEmpty()) {
+                mensajeError.value = "Digitar Nombre de Punto"
+                return
+            }
+
+            if (r.detalles!!.largo == 0.0) {
+                mensajeError.value = "Digitar Nombre de Punto"
+                return
+            }
+
+            if (r.detalles!!.ancho == 0.0) {
+                mensajeError.value = "Digitar Nombre de Punto"
+                return
+            }
         }
 
-        if (r.detalles!!.largo == 0.0) {
-            mensajeError.value = "Digitar Nombre de Punto"
-            return
-        }
-
-        if (r.detalles!!.ancho == 0.0) {
-            mensajeError.value = "Digitar Nombre de Punto"
-            return
-        }
-
-        insertOrUpdateRegistro(r,id)
+        insertOrUpdateRegistro(r, id, tipo)
     }
 
-    private fun insertOrUpdateRegistro(r: Registro,id:Int) {
-        roomRepository.insertOrUpdateRegistro(r,id)
+    private fun insertOrUpdateRegistro(r: Registro, id: Int, tipo: String) {
+        roomRepository.insertOrUpdateRegistro(r, id)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(object : CompletableObserver {
                 override fun onComplete() {
-                    if (r.registroId == 0) {
-                        mensajeSuccess.value = "Registro Guardado"
-                    } else {
-                        mensajeSuccess.value = "Registro Actualizado"
-                    }
+                    mensajeSuccess.value = tipo
+
                 }
 
                 override fun onSubscribe(d: Disposable) {
@@ -151,8 +150,8 @@ internal constructor(private val roomRepository: AppRepository) :
         return roomRepository.getRegistroById(id)
     }
 
-    fun getRegistroDetalle(id:Int) : LiveData<RegistroDetalle>{
-        return roomRepository.getRegistroDetalle(id)
+    fun getRegistroDetalle(tipo: Int, id: Int): LiveData<RegistroDetalle> {
+        return roomRepository.getRegistroDetalle(tipo, id)
     }
 
     fun deleteGaleria(d: MenuPrincipal, c: Context) {
@@ -173,8 +172,8 @@ internal constructor(private val roomRepository: AppRepository) :
             })
     }
 
-    fun updateFoto(tipo: Int, name: String, id: Int) {
-        roomRepository.updatePhoto(tipo, name, id)
+    fun updateFoto(tipo: Int, name: String, detalleId: Int, id: Int) {
+        roomRepository.updatePhoto(tipo, name, detalleId, id)
             .subscribeOn(Schedulers.computation())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(object : CompletableObserver {
@@ -204,7 +203,7 @@ internal constructor(private val roomRepository: AppRepository) :
         return roomRepository.getRegistroByObra(o)
     }
 
-    fun getRegistroDetalleById(id:Int) : LiveData<List<RegistroDetalle>>{
+    fun getRegistroDetalleById(id: Int): LiveData<List<RegistroDetalle>> {
         return roomRepository.getRegistroDetalleById(id)
     }
 }

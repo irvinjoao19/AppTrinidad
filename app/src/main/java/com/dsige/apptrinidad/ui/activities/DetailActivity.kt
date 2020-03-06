@@ -26,6 +26,16 @@ class DetailActivity : DaggerAppCompatActivity(), View.OnClickListener {
                     .putExtra("tipo", tipo)
                     .putExtra("usuarioId", usuarioId)
                     .putExtra("id", registroId)
+                    .putExtra("detalleId", 0)
+                    .putExtra("tipoDetalle", 0)
+            )
+            R.id.fabCamera ->  startActivity(
+                Intent(this, CameraActivity::class.java)
+                    .putExtra("tipo", 3)
+                    .putExtra("usuarioId", usuarioId)
+                    .putExtra("id", registroId)
+                    .putExtra("detalleId", 0)
+                    .putExtra("tipoDetalle", 0)
             )
         }
     }
@@ -90,7 +100,6 @@ class DetailActivity : DaggerAppCompatActivity(), View.OnClickListener {
                         )
                     }
                 }
-
             }
         })
 

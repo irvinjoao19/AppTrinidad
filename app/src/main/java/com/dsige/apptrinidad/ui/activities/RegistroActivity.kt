@@ -27,20 +27,9 @@ import javax.inject.Inject
 class RegistroActivity : DaggerAppCompatActivity(), View.OnClickListener, TextWatcher {
 
     override fun onClick(v: View) {
-        if (!verificacion) {
-            formRegistro()
-            return
-        }
-
-        if (count == 3) {
-            Util.toastMensaje(this, "Maximo 3 fotos")
-            return
-        }
-
         when (v.id) {
-            R.id.fabCamara -> goCamera()
-            R.id.fabGaleria -> {
-            }
+            R.id.fabCamara -> formRegistro("1")
+            R.id.fabGaleria -> formRegistro("2")
         }
     }
 
@@ -49,7 +38,6 @@ class RegistroActivity : DaggerAppCompatActivity(), View.OnClickListener, TextWa
     lateinit var registroViewModel: RegistroViewModel
 
     lateinit var r: Registro
-    private var verificacion: Boolean = false
     private var detalleId: Int = 0
     private var registroId: Int = 0
     private var tipoDetalle: Int = 0
@@ -83,11 +71,11 @@ class RegistroActivity : DaggerAppCompatActivity(), View.OnClickListener, TextWa
         fabCamara.setOnClickListener(this)
         fabGaleria.setOnClickListener(this)
 
-        editTextAncho.addTextChangedListener(this)
-        editTextLargo.addTextChangedListener(this)
-
         if (tipo == 2) {
             layoutReparacion.visibility = View.GONE
+        } else {
+            editTextAncho.addTextChangedListener(this)
+            editTextLargo.addTextChangedListener(this)
         }
 
         if (tipoDetalle != 0) {
@@ -127,10 +115,36 @@ class RegistroActivity : DaggerAppCompatActivity(), View.OnClickListener, TextWa
                 r = re
                 editTextObra.setText(re.nroObra)
                 editTextPoste.setText(re.nroPoste)
+
+                if (tipo == 1) {
+                    getDetalle(photoAdapter, detalleId, tipo)
+                } else {
+                    getDetalle(photoAdapter, r.registroId, tipo)
+                }
             }
         })
 
-        registroViewModel.getRegistroDetalle(detalleId)
+        registroViewModel.mensajeSuccess.observe(this, Observer<String> { s ->
+            if (s != null) {
+                if (count == 3) {
+                    Util.toastMensaje(this, "Maximo 3 fotos")
+                    return@Observer
+                }
+                if (s == "1") {
+                    goCamera()
+                }
+            }
+        })
+
+        registroViewModel.mensajeError.observe(this, Observer<String> { s ->
+            if (s != null) {
+                Util.toastMensaje(this, s)
+            }
+        })
+    }
+
+    private fun getDetalle(photoAdapter: PhotoAdapter, id: Int, tipo: Int) {
+        registroViewModel.getRegistroDetalle(tipo, id)
             .observe(this, Observer<RegistroDetalle> { d ->
                 if (d != null) {
                     editTextNombrePunto.setText(d.nombrePunto)
@@ -171,35 +185,21 @@ class RegistroActivity : DaggerAppCompatActivity(), View.OnClickListener, TextWa
                     }
                 }
             })
-
-        registroViewModel.mensajeSuccess.observe(this, Observer<String> { s ->
-            if (s != null) {
-                if (s != "Eliminado") {
-                    goCamera()
-                }
-                verificacion = true
-            }
-        })
-
-        registroViewModel.mensajeError.observe(this, Observer<String> { s ->
-            if (s != null) {
-                verificacion = false
-                Util.toastMensaje(this, s)
-            }
-        })
     }
 
-    private fun formRegistro() {
+    private fun formRegistro(tipo: String) {
         r.nroObra = editTextObra.text.toString()
         r.nroPoste = editTextPoste.text.toString()
         r.fecha = Util.getFecha()
         r.punto = editTextNombrePunto.text.toString().trim()
+        r.active = 1
 
         val d = RegistroDetalle()
         d.nombrePunto = editTextNombrePunto.text.toString().trim()
         d.tipo = if (checkbox.isChecked) 2 else 1
         d.registroId = registroId
-        d.detalleId  = detalleId
+        d.detalleId = detalleId
+
 
         when {
             editTextAncho.text.toString().isEmpty() -> d.ancho = 0.0
@@ -214,7 +214,7 @@ class RegistroActivity : DaggerAppCompatActivity(), View.OnClickListener, TextWa
             else -> d.totalM3 = editTextM3.text.toString().toDouble()
         }
         r.detalles = d
-        registroViewModel.validateRegistro(r, detalleId)
+        registroViewModel.validateRegistro(r, detalleId, tipo)
     }
 
     private fun deleteConfirmation(d: MenuPrincipal) {
@@ -238,7 +238,7 @@ class RegistroActivity : DaggerAppCompatActivity(), View.OnClickListener, TextWa
                 .putExtra("usuarioId", r.usuarioId)
                 .putExtra("id", r.usuarioId)
                 .putExtra("detalleId", detalleId)
-                .putExtra("tipoDetalle", if(tipoDetalle == 0) 1 else tipoDetalle)
+                .putExtra("tipoDetalle", if (tipoDetalle == 0) 1 else tipoDetalle)
         )
         finish()
     }

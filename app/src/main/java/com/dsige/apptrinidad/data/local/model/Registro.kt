@@ -18,9 +18,13 @@ open class Registro {
     var estado: String = ""
     var fecha: String = ""
     var active: Int = 0
-
+    var identity: Int = 0
     var punto: String = ""
 
     @Ignore
     var detalles: RegistroDetalle? = null
+
+    @Ignore
+    var list: List<RegistroDetalle>? = null
+
 }

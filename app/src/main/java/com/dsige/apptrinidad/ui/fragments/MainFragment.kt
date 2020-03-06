@@ -61,14 +61,24 @@ class MainFragment : DaggerFragment(), View.OnClickListener {
 
         val registroAdapter = RegistroAdapter(object : OnItemClickListener.RegistroListener {
             override fun onItemClick(r: Registro, view: View, position: Int) {
-                startActivity(
-                    Intent(context, DetailActivity::class.java)
-                        .putExtra("id",r.registroId)
-                        .putExtra("obra", r.nroObra)
-                        .putExtra("nroPoste", r.nroPoste)
-                        .putExtra("tipo", r.tipo)
-                        .putExtra("usuarioId", r.usuarioId)
-                )
+                if (r.tipo == 1) {
+                    startActivity(
+                        Intent(context, DetailActivity::class.java)
+                            .putExtra("id", r.registroId)
+                            .putExtra("obra", r.nroObra)
+                            .putExtra("nroPoste", r.nroPoste)
+                            .putExtra("tipo", r.tipo)
+                            .putExtra("usuarioId", r.usuarioId)
+                    )
+                } else {
+                    startActivity(
+                        Intent(context, RegistroActivity::class.java)
+                            .putExtra("tipo", r.tipo)
+                            .putExtra("usuarioId", r.usuarioId)
+                            .putExtra("id", r.registroId)
+                            .putExtra("tipoDetalle", 1)
+                    )
+                }
             }
         })
 
@@ -78,8 +88,8 @@ class MainFragment : DaggerFragment(), View.OnClickListener {
         recyclerView.adapter = registroAdapter
 
         registroViewModel.getRegistroByTipo(tipo)
-            .observe(viewLifecycleOwner, Observer<List<Registro>>{s->
-                if (s != null){
+            .observe(viewLifecycleOwner, Observer<List<Registro>> { s ->
+                if (s != null) {
                     registroAdapter.addItems(s)
                 }
             })

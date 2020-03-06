@@ -26,8 +26,8 @@ interface RegistroDetalleDao {
     @Query("SELECT * FROM RegistroDetalle")
     fun getRegistroPhoto(): RegistroDetalle
 
-    @Query("SELECT * FROM RegistroDetalle WHERE registroId=:id AND estado = 1")
-    fun getAllRegistroPhotoTask(id: Int): List<RegistroDetalle>
+    @Query("SELECT * FROM RegistroDetalle WHERE registroId=:id ")
+    fun getAllRegistroDetalleTask(id: Int): List<RegistroDetalle>
 
     @Query("SELECT * FROM RegistroDetalle WHERE detalleId =:id")
     fun getRegistroPhotoById(id: Int): LiveData<RegistroDetalle>
@@ -58,4 +58,10 @@ interface RegistroDetalleDao {
 
     @Query("SELECT * FROM RegistroDetalle WHERE registroId =:id")
     fun getRegistroDetalleByRegistroId(id: Int): LiveData<List<RegistroDetalle>>
+
+    @Query("UPDATE RegistroDetalle SET observacion =:obs WHERE detalleId =:id")
+    fun updateObservacion(id: Int, obs: String)
+
+    @Query("SELECT * FROM RegistroDetalle WHERE registroId =:id")
+    fun getRegistroDetalleFk(id: Int): LiveData<RegistroDetalle>
 }

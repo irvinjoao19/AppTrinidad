@@ -28,8 +28,10 @@
         android:usesCleartextTraffic="true"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning"
         tools:targetApi="m">
-        <activity android:name=".ui.activities.DetailActivity"></activity>
-        <activity android:name=".ui.activities.RegistroActivity" />
+        <activity android:name=".ui.activities.DetailActivity" />
+        <activity
+            android:name=".ui.activities.RegistroActivity"
+            android:windowSoftInputMode="stateHidden" />
         <activity android:name=".ui.activities.PreviewCameraActivity" />
         <activity android:name=".ui.activities.CameraActivity" />
         <activity android:name=".ui.activities.LoginActivity" />

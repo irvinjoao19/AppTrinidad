@@ -22,7 +22,7 @@ class PreviewCameraActivity : DaggerAppCompatActivity(), View.OnClickListener {
 
     override fun onClick(v: View) {
         when (v.id) {
-            R.id.fabOk -> registroViewModel.updateFoto(tipo, nameImg, detalleId)
+            R.id.fabOk -> registroViewModel.updateFoto(tipoDetalle, nameImg, detalleId,registroId)
             R.id.fabClose -> {
                 startActivity(Intent(this, CameraActivity::class.java))
                 finish()
@@ -102,15 +102,19 @@ class PreviewCameraActivity : DaggerAppCompatActivity(), View.OnClickListener {
 
         registroViewModel.mensajeSuccess.observe(this, Observer<String> { s ->
             if (s != null) {
-                startActivity(
-                    Intent(this, RegistroActivity::class.java)
-                        .putExtra("tipo", tipo)
-                        .putExtra("usuarioId", usuarioId)
-                        .putExtra("id", registroId)
-                        .putExtra("detalleId", detalleId)
-                        .putExtra("tipoDetalle", tipoDetalle)
-                )
-                finish()
+                if (tipo == 3) {
+                    finish()
+                } else {
+                    startActivity(
+                        Intent(this, RegistroActivity::class.java)
+                            .putExtra("tipo", tipo)
+                            .putExtra("usuarioId", usuarioId)
+                            .putExtra("id", registroId)
+                            .putExtra("detalleId", detalleId)
+                            .putExtra("tipoDetalle", tipoDetalle)
+                    )
+                    finish()
+                }
             }
         })
     }
