@@ -41,7 +41,7 @@ interface RegistroDao {
     @Query("DELETE FROM Registro")
     fun deleteAll()
 
-    @Query("UPDATE Registro SET active = 0 , identity=:retorno WHERE registroId =:id")
+    @Query("UPDATE Registro SET active = 2 , identity=:retorno WHERE registroId =:id")
     fun updateRegistroEstado(id: Int, retorno: Int)
 
     @Query("UPDATE Registro SET estado =:e")
@@ -62,6 +62,9 @@ interface RegistroDao {
     @Query("SELECT * FROM Registro WHERE nroObra =:o")
     fun getRegistroByObra(o: String): LiveData<List<Registro>>
 
-    @Query("UPDATE Registro SET foto =:name WHERE registroId =:id")
+    @Query("UPDATE Registro SET foto =:name ,active = 1 WHERE registroId =:id")
     fun updatePhoto(id: Int, name: String)
+
+    @Query("UPDATE Registro SET active = 1 WHERE registroId =:id")
+    fun closeRegistro(id: Int)
 }

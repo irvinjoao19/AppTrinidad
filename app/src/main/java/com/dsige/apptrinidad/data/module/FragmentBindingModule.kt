@@ -25,6 +25,9 @@ abstract class FragmentBindingModule {
 
         @ContributesAndroidInjector
         internal abstract fun providVehicleFragment(): VehicleFragment
+
+        @ContributesAndroidInjector
+        internal abstract fun providSendFragment(): SendFragment
     }
 
     @Module

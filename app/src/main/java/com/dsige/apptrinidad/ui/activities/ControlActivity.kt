@@ -52,6 +52,7 @@ class ControlActivity : DaggerAppCompatActivity(), View.OnClickListener {
         c.controlId = controlId
         c.placa = placa
         c.fecha = Util.getFecha()
+        c.estado = 0
 
         vehiculoViewModel.getControVehiculoById(controlId)
             .observe(this, Observer { v ->

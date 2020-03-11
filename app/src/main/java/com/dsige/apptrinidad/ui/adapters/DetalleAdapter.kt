@@ -3,6 +3,7 @@ package com.dsige.apptrinidad.ui.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.dsige.apptrinidad.R
 import com.dsige.apptrinidad.data.local.model.RegistroDetalle
@@ -38,10 +39,24 @@ class DetalleAdapter(private var listener: OnItemClickListener.DetalleListener) 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         internal fun bind(r: RegistroDetalle, listener: OnItemClickListener.DetalleListener) =
             with(itemView) {
+                if (r.active2 == 1 && r.active1 == 1) {
+                    textViewStatus.text = String.format("%s", "Cerrado")
+                    textViewStatus.setTextColor(ContextCompat.getColor(context, R.color.colorGreen))
+                }else{
+                    textViewStatus.text = String.format("%s", "Por Completar")
+                    textViewStatus.setTextColor(ContextCompat.getColor(context, R.color.colorRed))
+                }
+
                 textViewPunto.text = r.nombrePunto
                 textViewFecha.text = Util.getFecha()
                 buttonAntes.setOnClickListener { v -> listener.onItemClick(r, v, adapterPosition) }
-                buttonDespues.setOnClickListener { v -> listener.onItemClick(r, v, adapterPosition) }
+                buttonDespues.setOnClickListener { v ->
+                    listener.onItemClick(
+                        r,
+                        v,
+                        adapterPosition
+                    )
+                }
             }
     }
 }

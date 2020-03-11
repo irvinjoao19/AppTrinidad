@@ -23,4 +23,5 @@ open class VehiculoVales {
     var nombreGrifo: String = ""
     var pubCodigo: String = ""
     var foto: String = ""
+    var estado: Int = 0 // 0 -> por enviar 1 -> enviado
 }

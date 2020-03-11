@@ -11,6 +11,7 @@ import com.dsige.apptrinidad.R
 import com.dsige.apptrinidad.data.local.model.RegistroDetalle
 import com.dsige.apptrinidad.data.viewModel.RegistroViewModel
 import com.dsige.apptrinidad.data.viewModel.ViewModelFactory
+import com.dsige.apptrinidad.helper.Util
 import com.dsige.apptrinidad.ui.adapters.DetalleAdapter
 import com.dsige.apptrinidad.ui.listeners.OnItemClickListener
 import dagger.android.support.DaggerAppCompatActivity
@@ -29,14 +30,7 @@ class DetailActivity : DaggerAppCompatActivity(), View.OnClickListener {
                     .putExtra("detalleId", 0)
                     .putExtra("tipoDetalle", 0)
             )
-            R.id.fabCamera ->  startActivity(
-                Intent(this, CameraActivity::class.java)
-                    .putExtra("tipo", 3)
-                    .putExtra("usuarioId", usuarioId)
-                    .putExtra("id", registroId)
-                    .putExtra("detalleId", 0)
-                    .putExtra("tipoDetalle", 0)
-            )
+            R.id.fabCamera -> registroViewModel.validarRegistro(registroId)
         }
     }
 
@@ -80,24 +74,31 @@ class DetailActivity : DaggerAppCompatActivity(), View.OnClickListener {
             override fun onItemClick(r: RegistroDetalle, view: View, position: Int) {
                 when (view.id) {
                     R.id.buttonAntes -> {
-                        startActivity(
-                            Intent(this@DetailActivity, RegistroActivity::class.java)
-                                .putExtra("tipo", tipo)
-                                .putExtra("usuarioId", usuarioId)
-                                .putExtra("id", registroId)
-                                .putExtra("detalleId", r.detalleId)
-                                .putExtra("tipoDetalle", 1)
-                        )
+                        if (r.active1 == 0) {
+                            startActivity(
+                                Intent(this@DetailActivity, RegistroActivity::class.java)
+                                    .putExtra("tipo", tipo)
+                                    .putExtra("usuarioId", usuarioId)
+                                    .putExtra("id", registroId)
+                                    .putExtra("detalleId", r.detalleId)
+                                    .putExtra("tipoDetalle", 1)
+                            )
+                        } else
+                            Util.toastMensaje(this@DetailActivity, "Cerrado")
+
                     }
                     R.id.buttonDespues -> {
-                        startActivity(
-                            Intent(this@DetailActivity, RegistroActivity::class.java)
-                                .putExtra("tipo", tipo)
-                                .putExtra("usuarioId", usuarioId)
-                                .putExtra("id", registroId)
-                                .putExtra("detalleId", r.detalleId)
-                                .putExtra("tipoDetalle", 2)
-                        )
+                        if (r.active2 == 0) {
+                            startActivity(
+                                Intent(this@DetailActivity, RegistroActivity::class.java)
+                                    .putExtra("tipo", tipo)
+                                    .putExtra("usuarioId", usuarioId)
+                                    .putExtra("id", registroId)
+                                    .putExtra("detalleId", r.detalleId)
+                                    .putExtra("tipoDetalle", 2)
+                            )
+                        } else
+                            Util.toastMensaje(this@DetailActivity, "Cerrado")
                     }
                 }
             }
@@ -109,10 +110,36 @@ class DetailActivity : DaggerAppCompatActivity(), View.OnClickListener {
         recyclerView.adapter = detalleAdapter
 
         registroViewModel.getRegistroDetalleById(id)
-            .observe(this, Observer<List<RegistroDetalle>> { s ->
+            .observe(this, Observer { s ->
                 if (s != null) {
                     detalleAdapter.addItems(s)
                 }
             })
+
+        registroViewModel.mensajeSuccess.observe(this, Observer { v ->
+            if (v != null) {
+                if (v == "1") {
+                    startActivity(
+                        Intent(this, CameraActivity::class.java)
+                            .putExtra("tipo", 3)
+                            .putExtra("usuarioId", usuarioId)
+                            .putExtra("id", registroId)
+                            .putExtra("detalleId", 0)
+                            .putExtra("tipoDetalle", 0)
+                    )
+                    return@Observer
+                }
+
+                when (v) {
+                    "2" -> Util.toastMensaje(this, "Completar los puntos")
+                    "3" -> Util.toastMensaje(this, "No cuentas con ningun punto")
+                }
+            }
+        })
+        registroViewModel.mensajeError.observe(this, Observer { v ->
+            if (v != null) {
+                Util.toastMensaje(this, v)
+            }
+        })
     }
 }

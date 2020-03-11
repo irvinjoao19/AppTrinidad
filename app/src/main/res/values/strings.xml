@@ -98,4 +98,6 @@
     <string name="km_entrada">Entrada :</string>
     <string name="texto">texto</string>
     <string name="ingrese_kilometraje">Ingrese el Kilometraje</string>
+    <string name="texto_envio2">Envios de Reparación y Trabajos</string>
+    <string name="texto_envio1">Enviar Vehiculos</string>
 </resources>

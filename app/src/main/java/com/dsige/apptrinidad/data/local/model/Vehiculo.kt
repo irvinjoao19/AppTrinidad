@@ -18,6 +18,7 @@ open class Vehiculo {
     var condicion: String = ""
     var costo: String = ""
     var serie: String = ""
+    var estado: Int = 0 // 0 -> por enviar , 1 -> enviado
 
     @Ignore
     var control: List<VehiculoControl>? = null

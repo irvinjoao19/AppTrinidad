@@ -3,6 +3,7 @@ package com.dsige.apptrinidad.ui.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.dsige.apptrinidad.R
 import com.dsige.apptrinidad.data.local.model.Registro
@@ -38,11 +39,24 @@ class RegistroAdapter(private var listener: OnItemClickListener.RegistroListener
             with(itemView) {
                 textViewObra.text = String.format("Obra : %s", r.nroObra)
                 textViewNroPoste.text = String.format("Nro Poste : %s", r.nroPoste)
-                if (r.tipo == 2) {
-                    textViewEstado.text = r.fecha
-                } else {
-                    textViewEstado.text = r.estado
+                textViewEstado.text = when (r.active) {
+                    1 -> "Listo para enviar"
+                    2 -> "Enviado"
+                    else -> "Cerrar Registro"
                 }
+                textViewEstado.setTextColor(
+                    when (r.active) {
+                        1 -> ContextCompat.getColor(itemView.context, R.color.colorGreen)
+                        2 -> ContextCompat.getColor(itemView.context, R.color.colorPrimary)
+                        else -> ContextCompat.getColor(itemView.context, R.color.colorRed)
+                    }
+                )
+                if (r.tipo == 2) {
+                    textViewFecha.text = r.fecha
+                    textViewFecha.visibility = View.VISIBLE
+                } else
+                    textViewFecha.visibility = View.GONE
+
                 itemView.setOnClickListener { v -> listener.onItemClick(r, v, adapterPosition) }
             }
     }

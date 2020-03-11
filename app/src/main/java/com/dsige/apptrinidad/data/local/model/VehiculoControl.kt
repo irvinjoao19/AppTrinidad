@@ -1,7 +1,6 @@
 package com.dsige.apptrinidad.data.local.model
 
 import androidx.room.Entity
-import androidx.room.Ignore
 import androidx.room.PrimaryKey
 
 @Entity
@@ -16,4 +15,5 @@ open class VehiculoControl {
     var choferDni: String = ""
     var gesCodigo: String = ""
     var pubCodigo: String = ""
+    var estado: Int = 0 // 0 -> por enviar 1 -> enviado
 }

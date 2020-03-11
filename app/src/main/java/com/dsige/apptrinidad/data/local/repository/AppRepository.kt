@@ -41,6 +41,8 @@ interface AppRepository {
 
     fun saveData(body: RequestBody): Observable<Mensaje>
 
+    fun saveVehiculo(body: RequestBody): Observable<Mensaje>
+
     fun verification(body: RequestBody): Observable<String>
 
     fun verificateInspecciones(id: Int, fecha: String): Observable<Mensaje>
@@ -61,9 +63,7 @@ interface AppRepository {
 
     fun getDataRegistro(estado: Int): Observable<List<Registro>>
 
-    // TODO SERVICIOS
-
-    fun getServices(): Observable<List<Servicio>>
+    fun getDataVehiculo(estado: Int): Observable<List<Vehiculo>>
 
     // TODO REGISTRO
 
@@ -110,4 +110,10 @@ interface AppRepository {
     fun getValeVehiculo(placa: String): LiveData<List<VehiculoVales>>
 
     fun getValeVehiculoById(id: Int): LiveData<VehiculoVales>
+
+    fun closeRegistroDetalle(registroId:Int,detalleId: Int,tipoDetalle:Int,tipo:Int): Completable
+
+    fun validarRegistro(registroId: Int) : Observable<Int>
+
+    fun updateVehiculo(messages: Mensaje): Completable
 }

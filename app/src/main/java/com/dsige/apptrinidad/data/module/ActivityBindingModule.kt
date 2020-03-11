@@ -13,7 +13,6 @@ abstract class ActivityBindingModule {
     @ContributesAndroidInjector(modules = [FragmentBindingModule.Main::class])
     internal abstract fun bindMainActivity(): MainActivity
 
-
     @ContributesAndroidInjector(modules = [FragmentBindingModule.Camera::class])
     internal abstract fun bindCameraActivity(): CameraActivity
 

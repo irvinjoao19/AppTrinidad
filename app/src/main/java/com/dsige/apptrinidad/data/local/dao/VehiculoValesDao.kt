@@ -36,4 +36,10 @@ interface VehiculoValesDao {
 
     @Query("SELECT * FROM VehiculoVales WHERE valeId =:id")
     fun getValeVehiculoById(id: Int): LiveData<VehiculoVales>
+
+    @Query("SELECT * FROM VehiculoVales WHERE placa =:id")
+    fun getVehiculoValeTaskById(id: String): List<VehiculoVales>
+
+    @Query("UPDATE VehiculoVales SET estado=:i")
+    fun updateEnabledVale(i: Int)
 }

@@ -18,7 +18,7 @@ import com.dsige.apptrinidad.data.local.model.*
         VehiculoControl::class,
         VehiculoVales::class
     ],
-    version = 13,
+    version = 15,
     exportSchema = false
 )
 abstract class AppDataBase : RoomDatabase() {

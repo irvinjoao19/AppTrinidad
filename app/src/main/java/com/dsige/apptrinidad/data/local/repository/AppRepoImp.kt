@@ -101,6 +101,10 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         return apiService.save(body)
     }
 
+    override fun saveVehiculo(body: RequestBody): Observable<Mensaje> {
+        return apiService.saveVehiculo(body)
+    }
+
     override fun verification(body: RequestBody): Observable<String> {
         return apiService.verification(body)
     }
@@ -136,7 +140,7 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
     override fun updateRegistro(m: Mensaje): Completable {
         return Completable.fromAction {
             dataBase.registroDao().updateRegistroEstado(m.codigoBase, m.codigoRetorno)
-            dataBase.registroDetalleDao().updateRegistroPhotoEstado(m.codigoBase)
+//            dataBase.registroDetalleDao().updateRegistroPhotoEstado(m.codigoBase)
         }
     }
 
@@ -146,29 +150,41 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
      */
     override fun getDataRegistro(estado: Int): Observable<List<Registro>> {
         return Observable.create { emitter ->
-            val list: ArrayList<Registro> = ArrayList()
             val v: List<Registro> = dataBase.registroDao().getAllRegistroTask(estado)
-            for (r: Registro in v) {
-                val detalle = dataBase.registroDetalleDao().getAllRegistroDetalleTask(r.registroId)
-                r.list = detalle
-                list.add(r)
-            }
-            emitter.onNext(list)
+            if (v.isNotEmpty()) {
+                val list: ArrayList<Registro> = ArrayList()
+                for (r: Registro in v) {
+                    val detalle =
+                        dataBase.registroDetalleDao().getAllRegistroDetalleTask(r.registroId)
+                    r.list = detalle
+                    list.add(r)
+                }
+                emitter.onNext(list)
+            } else
+                emitter.onError(Throwable("No hay datos disponibles por enviar"))
+
             emitter.onComplete()
         }
     }
 
-    override fun getServices(): Observable<List<Servicio>> {
+    override fun getDataVehiculo(estado: Int): Observable<List<Vehiculo>> {
         return Observable.create { emitter ->
-            val list: ArrayList<Servicio> = ArrayList()
-            val v: List<Servicio> = dataBase.servicioDao().getServicioTask()
-            for (r: Servicio in v) {
-                if (r.servicioId != 5) {
-//                    r.size = dataBase.suministroDao().getSuministroSizeTask(r.servicioId.toString())
+            val v: List<Vehiculo> = dataBase.vehiculoDao().getAllVehiculoTask(estado)
+            if (v.isNotEmpty()) {
+                val list: ArrayList<Vehiculo> = ArrayList()
+                for (c: Vehiculo in v) {
+                    val control: List<VehiculoControl> =
+                        dataBase.vehiculoControlDao().getVehiculoControlTaskById(c.placa)
+                    c.control = control
+                    val vale: List<VehiculoVales> =
+                        dataBase.vehiculoValesDao().getVehiculoValeTaskById(c.placa)
+                    c.registros = vale
+                    list.add(c)
                 }
-                list.add(r)
-            }
-            emitter.onNext(list)
+                emitter.onNext(list)
+            } else
+                emitter.onError(Throwable("No hay datos disponibles por enviar"))
+
             emitter.onComplete()
         }
     }
@@ -338,5 +354,55 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
 
     override fun getValeVehiculoById(id: Int): LiveData<VehiculoVales> {
         return dataBase.vehiculoValesDao().getValeVehiculoById(id)
+    }
+
+    override fun closeRegistroDetalle(
+        registroId: Int, detalleId: Int, tipoDetalle: Int, tipo: Int
+    ): Completable {
+        return Completable.fromAction {
+            when (tipo) {
+                1 -> when (tipoDetalle) {
+                    1 -> dataBase.registroDetalleDao().closeRegistroDetalle1(detalleId)
+                    2 -> dataBase.registroDetalleDao().closeRegistroDetalle2(detalleId)
+                }
+                2 -> {
+                    dataBase.registroDetalleDao().closeRegistroDetalle1(detalleId)
+                    dataBase.registroDao().closeRegistro(registroId)
+                }
+            }
+        }
+    }
+
+    override fun validarRegistro(registroId: Int): Observable<Int> {
+        return Observable.create { emitter ->
+            val v: List<RegistroDetalle>? =
+                dataBase.registroDetalleDao().getAllRegistroDetalleTask(registroId)
+            if (v != null) {
+                val size = v.size
+                var count = 0
+                for (r: RegistroDetalle in v) {
+                    if (r.active1 == 1 && r.active2 == 1) {
+                        count++
+                    }
+                }
+
+                if (size == count) {
+                    emitter.onNext(1)
+                } else
+                    emitter.onNext(2)
+            } else {
+                emitter.onNext(3)
+            }
+
+            emitter.onComplete()
+        }
+    }
+
+    override fun updateVehiculo(messages: Mensaje): Completable {
+        return Completable.fromAction {
+            dataBase.vehiculoDao().updateEnabledVehiculo(1)
+            dataBase.vehiculoValesDao().updateEnabledVale(0)
+            dataBase.vehiculoControlDao().updateEnabledControl(0)
+        }
     }
 }

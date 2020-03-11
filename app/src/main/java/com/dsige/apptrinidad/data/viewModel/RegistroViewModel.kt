@@ -12,6 +12,7 @@ import com.dsige.apptrinidad.data.local.repository.AppRepository
 import com.dsige.apptrinidad.helper.Util
 import io.reactivex.CompletableObserver
 import io.reactivex.Observable
+import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -205,5 +206,47 @@ internal constructor(private val roomRepository: AppRepository) :
 
     fun getRegistroDetalleById(id: Int): LiveData<List<RegistroDetalle>> {
         return roomRepository.getRegistroDetalleById(id)
+    }
+
+    fun closeRegistro(registroId: Int,detalleId: Int, tipoDetalle:Int,tipo: Int) {
+        roomRepository.closeRegistroDetalle(registroId,detalleId,tipoDetalle, tipo)
+            .subscribeOn(Schedulers.computation())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : CompletableObserver {
+                override fun onSubscribe(d: Disposable) {
+                }
+
+                override fun onComplete() {
+                    mensajeSuccess.value = "Cerrado"
+                }
+
+                override fun onError(e: Throwable) {
+                    mensajeError.value = e.toString()
+                }
+            })
+    }
+
+    fun validarRegistro(registroId: Int) {
+        roomRepository.validarRegistro(registroId)
+            .subscribeOn(Schedulers.computation())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : Observer<Int> {
+                override fun onComplete() {
+
+                }
+
+                override fun onSubscribe(d: Disposable) {
+
+                }
+
+                override fun onNext(t: Int) {
+                    mensajeSuccess.value = t.toString()
+                }
+
+                override fun onError(e: Throwable) {
+                    mensajeError.value = e.toString()
+                }
+
+            })
     }
 }

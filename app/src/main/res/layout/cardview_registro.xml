@@ -10,10 +10,10 @@
         android:id="@+id/textViewObra"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:textColor="@color/colorPrimary"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:text="obra"
+        android:textColor="@color/colorPrimary"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -22,7 +22,7 @@
         android:id="@+id/textViewNroPoste"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
+        android:layout_margin="8dp"
         android:text="nro poste"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -40,6 +40,19 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textViewFecha"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:text="Estado"
+        android:textColor="@color/colorGreen"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <View
         android:layout_width="0dp"

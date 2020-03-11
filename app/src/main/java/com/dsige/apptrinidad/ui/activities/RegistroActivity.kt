@@ -16,6 +16,7 @@ import com.dsige.apptrinidad.data.local.model.Registro
 import com.dsige.apptrinidad.data.local.model.RegistroDetalle
 import com.dsige.apptrinidad.data.viewModel.*
 import com.dsige.apptrinidad.data.viewModel.ViewModelFactory
+import com.dsige.apptrinidad.helper.Gps
 import com.dsige.apptrinidad.helper.Util
 import com.dsige.apptrinidad.ui.adapters.PhotoAdapter
 import com.dsige.apptrinidad.ui.listeners.OnItemClickListener
@@ -32,6 +33,12 @@ class RegistroActivity : DaggerAppCompatActivity(), View.OnClickListener, TextWa
         when (v.id) {
             R.id.fabCamara -> formRegistro("1")
             R.id.fabGaleria -> formRegistro("2")
+            R.id.fabSave -> registroViewModel.closeRegistro(
+                registroId,
+                detalleId,
+                tipoDetalle,
+                r.tipo
+            )
         }
     }
 
@@ -72,6 +79,7 @@ class RegistroActivity : DaggerAppCompatActivity(), View.OnClickListener, TextWa
 
         fabCamara.setOnClickListener(this)
         fabGaleria.setOnClickListener(this)
+        fabSave.setOnClickListener(this)
 
         if (tipo == 2) {
             layoutReparacion.visibility = View.GONE
@@ -128,10 +136,23 @@ class RegistroActivity : DaggerAppCompatActivity(), View.OnClickListener, TextWa
 
         registroViewModel.mensajeSuccess.observe(this, Observer { s ->
             if (s != null) {
-                if (count == 3) {
-                    Util.toastMensaje(this, "Maximo 3 fotos")
+                if (s == "Cerrado") {
+                    finish()
                     return@Observer
                 }
+
+                if (tipo == 1) {
+                    if (count == 2) {
+                        Util.toastMensaje(this, "Maximo 2 fotos")
+                        return@Observer
+                    }
+                } else {
+                    if (count == 3) {
+                        Util.toastMensaje(this, "Maximo 3 fotos")
+                        return@Observer
+                    }
+                }
+
                 if (s == "1") {
                     goCamera()
                 }
@@ -147,7 +168,7 @@ class RegistroActivity : DaggerAppCompatActivity(), View.OnClickListener, TextWa
 
     private fun getDetalle(photoAdapter: PhotoAdapter, id: Int, tipo: Int) {
         registroViewModel.getRegistroDetalle(tipo, id)
-            .observe(this, Observer<RegistroDetalle> { d ->
+            .observe(this, Observer { d ->
                 if (d != null) {
                     editTextNombrePunto.setText(d.nombrePunto)
                     editTextLargo.setText(d.largo.toString())
@@ -169,6 +190,17 @@ class RegistroActivity : DaggerAppCompatActivity(), View.OnClickListener, TextWa
                             a.add(MenuPrincipal(d.detalleId, d.foto3PuntoAntes, 3))
                             count++
                         }
+
+                        if (tipo == 1) {
+                            if (count == 2) {
+                                fabSave.visibility = View.VISIBLE
+                            } else
+                                fabSave.visibility = View.GONE
+                        } else {
+                            if (count == 3) {
+                                fabSave.visibility = View.VISIBLE
+                            } else fabSave.visibility = View.GONE
+                        }
                         photoAdapter.addItems(a)
                     } else {
                         val a = ArrayList<MenuPrincipal>()
@@ -184,6 +216,10 @@ class RegistroActivity : DaggerAppCompatActivity(), View.OnClickListener, TextWa
                             a.add(MenuPrincipal(d.detalleId, d.foto3PuntoDespues, 6))
                             count++
                         }
+                        if (count == 2) {
+                            fabSave.visibility = View.VISIBLE
+                        } else
+                            fabSave.visibility = View.GONE
                         photoAdapter.addItems(a)
                     }
                 }
@@ -191,33 +227,42 @@ class RegistroActivity : DaggerAppCompatActivity(), View.OnClickListener, TextWa
     }
 
     private fun formRegistro(tipo: String) {
-        r.nroObra = editTextObra.text.toString().toUpperCase(Locale.getDefault())
-        r.nroPoste = editTextPoste.text.toString()
-        r.fecha = Util.getFecha()
-        r.punto = editTextNombrePunto.text.toString().trim()
-        r.active = 1
+        val gps = Gps(this)
+        if (gps.isLocationEnabled()) {
+            if (gps.latitude.toString() != "0.0" || gps.longitude.toString() != "0.0") {
+                r.nroObra = editTextObra.text.toString().toUpperCase(Locale.getDefault())
+                r.nroPoste = editTextPoste.text.toString()
+                r.fecha = Util.getFecha()
+                r.latitud = gps.latitude.toString()
+                r.longitud = gps.longitude.toString()
+                r.punto = editTextNombrePunto.text.toString().trim()
+                r.active = 0
+                
+                val d = RegistroDetalle()
+                d.nombrePunto = editTextNombrePunto.text.toString().trim()
+                d.tipo = if (checkbox.isChecked) 2 else 1
+                d.registroId = registroId
+                d.detalleId = detalleId
+                d.observacion = editTextObservacion.text.toString().trim()
 
-        val d = RegistroDetalle()
-        d.nombrePunto = editTextNombrePunto.text.toString().trim()
-        d.tipo = if (checkbox.isChecked) 2 else 1
-        d.registroId = registroId
-        d.detalleId = detalleId
-        d.observacion = editTextObservacion.text.toString().trim()
-
-        when {
-            editTextAncho.text.toString().isEmpty() -> d.ancho = 0.0
-            else -> d.ancho = editTextAncho.text.toString().toDouble()
+                when {
+                    editTextAncho.text.toString().isEmpty() -> d.ancho = 0.0
+                    else -> d.ancho = editTextAncho.text.toString().toDouble()
+                }
+                when {
+                    editTextLargo.text.toString().isEmpty() -> d.largo = 0.0
+                    else -> d.largo = editTextLargo.text.toString().toDouble()
+                }
+                when {
+                    editTextM3.text.toString().isEmpty() -> d.totalM3 = 0.0
+                    else -> d.totalM3 = editTextM3.text.toString().toDouble()
+                }
+                r.detalles = d
+                registroViewModel.validateRegistro(r, detalleId, tipo)
+            }
+        } else {
+            gps.showSettingsAlert(this)
         }
-        when {
-            editTextLargo.text.toString().isEmpty() -> d.largo = 0.0
-            else -> d.largo = editTextLargo.text.toString().toDouble()
-        }
-        when {
-            editTextM3.text.toString().isEmpty() -> d.totalM3 = 0.0
-            else -> d.totalM3 = editTextM3.text.toString().toDouble()
-        }
-        r.detalles = d
-        registroViewModel.validateRegistro(r, detalleId, tipo)
     }
 
     private fun deleteConfirmation(d: MenuPrincipal) {

@@ -30,4 +30,10 @@ interface VehiculoDao {
 
     @Query("SELECT * FROM Vehiculo")
     fun getVehiculosTask(): List<Vehiculo>
+
+    @Query("SELECT * FROM Vehiculo WHERE estado =:e")
+    fun getAllVehiculoTask(e: Int): List<Vehiculo>
+
+    @Query("UPDATE Vehiculo SET estado =:e")
+    fun updateEnabledVehiculo(e: Int)
 }

@@ -14,6 +14,7 @@ import com.dsige.apptrinidad.R
 import com.dsige.apptrinidad.data.local.model.Registro
 import com.dsige.apptrinidad.data.viewModel.RegistroViewModel
 import com.dsige.apptrinidad.data.viewModel.ViewModelFactory
+import com.dsige.apptrinidad.helper.Util
 import com.dsige.apptrinidad.ui.activities.DetailActivity
 import com.dsige.apptrinidad.ui.activities.RegistroActivity
 import com.dsige.apptrinidad.ui.adapters.RegistroAdapter
@@ -62,22 +63,28 @@ class MainFragment : DaggerFragment(), View.OnClickListener {
         val registroAdapter = RegistroAdapter(object : OnItemClickListener.RegistroListener {
             override fun onItemClick(r: Registro, view: View, position: Int) {
                 if (r.tipo == 1) {
-                    startActivity(
-                        Intent(context, DetailActivity::class.java)
-                            .putExtra("id", r.registroId)
-                            .putExtra("obra", r.nroObra)
-                            .putExtra("nroPoste", r.nroPoste)
-                            .putExtra("tipo", r.tipo)
-                            .putExtra("usuarioId", r.usuarioId)
-                    )
+                    if (r.active == 0) {
+                        startActivity(
+                            Intent(context, DetailActivity::class.java)
+                                .putExtra("id", r.registroId)
+                                .putExtra("obra", r.nroObra)
+                                .putExtra("nroPoste", r.nroPoste)
+                                .putExtra("tipo", r.tipo)
+                                .putExtra("usuarioId", r.usuarioId)
+                        )
+                    } else
+                        Util.toastMensaje(context!!, "Registro Cerrado")
                 } else {
-                    startActivity(
-                        Intent(context, RegistroActivity::class.java)
-                            .putExtra("tipo", r.tipo)
-                            .putExtra("usuarioId", r.usuarioId)
-                            .putExtra("id", r.registroId)
-                            .putExtra("tipoDetalle", 1)
-                    )
+                    if (r.active == 0) {
+                        startActivity(
+                            Intent(context, RegistroActivity::class.java)
+                                .putExtra("tipo", r.tipo)
+                                .putExtra("usuarioId", r.usuarioId)
+                                .putExtra("id", r.registroId)
+                                .putExtra("tipoDetalle", 1)
+                        )
+                    } else
+                        Util.toastMensaje(context!!, "Registro Cerrado")
                 }
             }
         })

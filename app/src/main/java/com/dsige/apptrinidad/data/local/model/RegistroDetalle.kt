@@ -24,4 +24,7 @@ open class RegistroDetalle {
     var foto2PuntoDespues: String = ""
     var foto3PuntoDespues: String = ""
     var estado: Int = 0
+
+    var active1: Int = 0
+    var active2: Int = 0
 }

@@ -5,10 +5,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.dsige.apptrinidad.data.local.model.Registro
-import com.dsige.apptrinidad.data.local.model.RegistroDetalle
-import com.dsige.apptrinidad.data.local.model.Sync
-import com.dsige.apptrinidad.data.local.model.Usuario
+import com.dsige.apptrinidad.data.local.model.*
 import com.dsige.apptrinidad.data.local.repository.ApiError
 import com.dsige.apptrinidad.data.local.repository.AppRepository
 import com.dsige.apptrinidad.helper.Mensaje
@@ -61,7 +58,7 @@ internal constructor(private val roomRepository: AppRepository, private val retr
                 }
 
                 override fun onNext(usuario: Usuario) {
-                    insertUsuario(usuario,version)
+                    insertUsuario(usuario, version)
                 }
 
                 override fun onError(t: Throwable) {
@@ -83,7 +80,7 @@ internal constructor(private val roomRepository: AppRepository, private val retr
             })
     }
 
-    fun insertUsuario(u: Usuario,v:String) {
+    fun insertUsuario(u: Usuario, v: String) {
         roomRepository.insertUsuario(u)
             .delay(3, TimeUnit.SECONDS)
             .subscribeOn(Schedulers.computation())
@@ -93,7 +90,7 @@ internal constructor(private val roomRepository: AppRepository, private val retr
                 }
 
                 override fun onComplete() {
-                    sync(u.usuarioId,v)
+                    sync(u.usuarioId, v)
                 }
 
                 override fun onError(e: Throwable) {
@@ -103,8 +100,8 @@ internal constructor(private val roomRepository: AppRepository, private val retr
     }
 
 
-    private fun sync(id:String,v:String){
-        roomRepository.getSync(id,v)
+    private fun sync(id: String, v: String) {
+        roomRepository.getSync(id, v)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(object : Observer<Sync> {
@@ -127,7 +124,7 @@ internal constructor(private val roomRepository: AppRepository, private val retr
             })
     }
 
-    private fun saveSync(s:Sync){
+    private fun saveSync(s: Sync) {
         roomRepository.saveSync(s)
             .subscribeOn(Schedulers.computation())
             .observeOn(AndroidSchedulers.mainThread())
@@ -171,97 +168,113 @@ internal constructor(private val roomRepository: AppRepository, private val retr
     fun sendData(context: Context) {
         val auditorias: Observable<List<Registro>> = roomRepository.getDataRegistro(1)
         auditorias.flatMap { observable ->
-            Observable.fromIterable(observable).flatMap { a ->
-                val b = MultipartBody.Builder()
-
-                if (a.foto.isNotEmpty()) {
-                    val file = File(Util.getFolder(context), a.foto)
-                    if (file.exists()) {
-                        b.addFormDataPart(
-                            "files", file.name,
-                            RequestBody.create(MediaType.parse("multipart/form-data"), file)
-                        )
-                    }
-                }
-
-                val detalles: List<RegistroDetalle>? = a.list
-                if (detalles != null) {
-                    for (p: RegistroDetalle in detalles) {
-                        if (p.foto1PuntoAntes.isNotEmpty()) {
-                            val file = File(Util.getFolder(context), p.foto1PuntoAntes)
-                            if (file.exists()) {
-                                b.addFormDataPart(
-                                    "files", file.name,
-                                    RequestBody.create(MediaType.parse("multipart/form-data"), file)
-                                )
-                            }
-                        }
-
-                        if (p.foto2PuntoAntes.isNotEmpty()) {
-                            val file = File(Util.getFolder(context), p.foto2PuntoAntes)
-                            if (file.exists()) {
-                                b.addFormDataPart(
-                                    "files", file.name,
-                                    RequestBody.create(MediaType.parse("multipart/form-data"), file)
-                                )
-                            }
-                        }
-
-                        if (p.foto3PuntoAntes.isNotEmpty()) {
-                            val file = File(Util.getFolder(context), p.foto3PuntoAntes)
-                            if (file.exists()) {
-                                b.addFormDataPart(
-                                    "files", file.name,
-                                    RequestBody.create(MediaType.parse("multipart/form-data"), file)
-                                )
-                            }
-                        }
-
-                        if (p.foto1PuntoDespues.isNotEmpty()) {
-                            val file = File(Util.getFolder(context), p.foto1PuntoDespues)
-                            if (file.exists()) {
-                                b.addFormDataPart(
-                                    "files", file.name,
-                                    RequestBody.create(MediaType.parse("multipart/form-data"), file)
-                                )
-                            }
-                        }
-
-                        if (p.foto2PuntoDespues.isNotEmpty()) {
-                            val file = File(Util.getFolder(context), p.foto2PuntoDespues)
-                            if (file.exists()) {
-                                b.addFormDataPart(
-                                    "files", file.name,
-                                    RequestBody.create(MediaType.parse("multipart/form-data"), file)
-                                )
-                            }
-                        }
-
-                        if (p.foto3PuntoDespues.isNotEmpty()) {
-                            val file = File(Util.getFolder(context), p.foto3PuntoDespues)
-                            if (file.exists()) {
-                                b.addFormDataPart(
-                                    "files", file.name,
-                                    RequestBody.create(MediaType.parse("multipart/form-data"), file)
-                                )
-                            }
+                Observable.fromIterable(observable).flatMap { a ->
+                    val b = MultipartBody.Builder()
+                    if (a.foto.isNotEmpty()) {
+                        val file = File(Util.getFolder(context), a.foto)
+                        if (file.exists()) {
+                            b.addFormDataPart(
+                                "files", file.name,
+                                RequestBody.create(MediaType.parse("multipart/form-data"), file)
+                            )
                         }
                     }
+                    val detalles: List<RegistroDetalle>? = a.list
+                    if (detalles != null) {
+                        for (p: RegistroDetalle in detalles) {
+                            if (p.foto1PuntoAntes.isNotEmpty()) {
+                                val file = File(Util.getFolder(context), p.foto1PuntoAntes)
+                                if (file.exists()) {
+                                    b.addFormDataPart(
+                                        "files", file.name,
+                                        RequestBody.create(
+                                            MediaType.parse("multipart/form-data"),
+                                            file
+                                        )
+                                    )
+                                }
+                            }
+
+                            if (p.foto2PuntoAntes.isNotEmpty()) {
+                                val file = File(Util.getFolder(context), p.foto2PuntoAntes)
+                                if (file.exists()) {
+                                    b.addFormDataPart(
+                                        "files", file.name,
+                                        RequestBody.create(
+                                            MediaType.parse("multipart/form-data"),
+                                            file
+                                        )
+                                    )
+                                }
+                            }
+
+                            if (p.foto3PuntoAntes.isNotEmpty()) {
+                                val file = File(Util.getFolder(context), p.foto3PuntoAntes)
+                                if (file.exists()) {
+                                    b.addFormDataPart(
+                                        "files", file.name,
+                                        RequestBody.create(
+                                            MediaType.parse("multipart/form-data"),
+                                            file
+                                        )
+                                    )
+                                }
+                            }
+
+                            if (p.foto1PuntoDespues.isNotEmpty()) {
+                                val file = File(Util.getFolder(context), p.foto1PuntoDespues)
+                                if (file.exists()) {
+                                    b.addFormDataPart(
+                                        "files", file.name,
+                                        RequestBody.create(
+                                            MediaType.parse("multipart/form-data"),
+                                            file
+                                        )
+                                    )
+                                }
+                            }
+
+                            if (p.foto2PuntoDespues.isNotEmpty()) {
+                                val file = File(Util.getFolder(context), p.foto2PuntoDespues)
+                                if (file.exists()) {
+                                    b.addFormDataPart(
+                                        "files", file.name,
+                                        RequestBody.create(
+                                            MediaType.parse("multipart/form-data"),
+                                            file
+                                        )
+                                    )
+                                }
+                            }
+
+                            if (p.foto3PuntoDespues.isNotEmpty()) {
+                                val file = File(Util.getFolder(context), p.foto3PuntoDespues)
+                                if (file.exists()) {
+                                    b.addFormDataPart(
+                                        "files", file.name,
+                                        RequestBody.create(
+                                            MediaType.parse("multipart/form-data"),
+                                            file
+                                        )
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    val json = Gson().toJson(a)
+                    Log.i("TAG", json)
+                    b.setType(MultipartBody.FORM)
+                    b.addFormDataPart("data", json)
+
+                    val body = b.build()
+                    Observable.zip(
+                        Observable.just(a), roomRepository.saveData(body),
+                        BiFunction<Registro, Mensaje, Mensaje> { _, mensaje ->
+                            mensaje
+                        })
                 }
-
-                val json = Gson().toJson(a)
-                Log.i("TAG", json)
-                b.setType(MultipartBody.FORM)
-                b.addFormDataPart("data", json)
-
-                val body = b.build()
-                Observable.zip(
-                    Observable.just(a), roomRepository.saveData(body),
-                    BiFunction<Registro, Mensaje, Mensaje> { _, mensaje ->
-                        mensaje
-                    })
-            }
-        }.subscribeOn(Schedulers.io())
+            }.subscribeOn(Schedulers.io())
             .delay(1000, TimeUnit.MILLISECONDS)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(object : Observer<Mensaje> {
@@ -286,7 +299,7 @@ internal constructor(private val roomRepository: AppRepository, private val retr
                             Log.i("TAG", e1.toString())
                         }
                     } else {
-                        mensajeError.postValue(e.toString())
+                        mensajeError.postValue(e.message)
                     }
                 }
 
@@ -297,6 +310,94 @@ internal constructor(private val roomRepository: AppRepository, private val retr
 
     private fun updateRegistro(messages: Mensaje) {
         roomRepository.updateRegistro(messages)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : CompletableObserver {
+                override fun onComplete() {
+                    mensajeSuccess.value = messages.mensaje
+                }
+
+                override fun onSubscribe(d: Disposable) {
+
+                }
+
+                override fun onError(e: Throwable) {
+                    Log.i("TAG", e.toString())
+                }
+            })
+    }
+
+    fun sendDataVehiculo(context: Context) {
+        val auditorias: Observable<List<Vehiculo>> = roomRepository.getDataVehiculo(1)
+        auditorias.flatMap { observable ->
+                Observable.fromIterable(observable).flatMap { a ->
+                    val b = MultipartBody.Builder()
+                    val vale: List<VehiculoVales>? = a.registros
+                    if (vale != null) {
+                        for (v: VehiculoVales in vale) {
+                            if (v.foto.isNotEmpty()) {
+                                val file = File(Util.getFolder(context), v.foto)
+                                if (file.exists()) {
+                                    b.addFormDataPart(
+                                        "files", file.name,
+                                        RequestBody.create(
+                                            MediaType.parse("multipart/form-data"),
+                                            file
+                                        )
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    val json = Gson().toJson(a)
+                    Log.i("TAG", json)
+                    b.setType(MultipartBody.FORM)
+                    b.addFormDataPart("data", json)
+
+                    val body = b.build()
+                    Observable.zip(
+                        Observable.just(a), roomRepository.saveVehiculo(body),
+                        BiFunction<Vehiculo, Mensaje, Mensaje> { _, mensaje ->
+                            mensaje
+                        })
+                }
+            }.subscribeOn(Schedulers.io())
+            .delay(1000, TimeUnit.MILLISECONDS)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : Observer<Mensaje> {
+
+                override fun onSubscribe(d: Disposable) {
+                    Log.i("TAG", d.toString())
+                }
+
+                override fun onNext(m: Mensaje) {
+                    Log.i("TAG", "RECIBIENDO LOS DATOS")
+                    updateVehiculo(m)
+                }
+
+                override fun onError(e: Throwable) {
+                    if (e is HttpException) {
+                        val body = e.response().errorBody()
+                        try {
+                            val error = retrofit.errorConverter.convert(body!!)
+                            mensajeError.postValue(error.Message)
+                        } catch (e1: IOException) {
+                            e1.printStackTrace()
+                            Log.i("TAG", e1.toString())
+                        }
+                    } else {
+                        mensajeError.postValue(e.message)
+                    }
+                }
+
+                override fun onComplete() {
+                }
+            })
+    }
+
+    private fun updateVehiculo(messages: Mensaje) {
+        roomRepository.updateVehiculo(messages)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(object : CompletableObserver {

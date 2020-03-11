@@ -19,6 +19,7 @@ import com.dsige.apptrinidad.data.viewModel.UsuarioViewModel
 import com.dsige.apptrinidad.data.viewModel.ViewModelFactory
 import com.dsige.apptrinidad.helper.Util
 import com.dsige.apptrinidad.ui.fragments.MainFragment
+import com.dsige.apptrinidad.ui.fragments.SendFragment
 import com.dsige.apptrinidad.ui.fragments.VehicleFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
@@ -89,10 +90,10 @@ class MainActivity : DaggerAppCompatActivity(), NavigationView.OnNavigationItemS
                 "Trabajos SS"
             )
             R.id.logout -> dialogLogout()
-            R.id.envio -> {
-                load("Enviando")
-                usuarioViewModel.sendData(this)
-            }
+            R.id.envio -> changeFragment(
+                SendFragment.newInstance("", ""),
+                "Enviar Pendientes"
+            )
         }
         drawerLayout.closeDrawer(GravityCompat.START)
         return true
@@ -102,17 +103,25 @@ class MainActivity : DaggerAppCompatActivity(), NavigationView.OnNavigationItemS
         startActivity(i)
     }
 
-    private fun load(title: String) {
+    private fun load() {
         builder = AlertDialog.Builder(ContextThemeWrapper(this@MainActivity, R.style.AppTheme))
         @SuppressLint("InflateParams") val view =
             LayoutInflater.from(this@MainActivity).inflate(R.layout.dialog_login, null)
         builder.setView(view)
         val textViewTitle: TextView = view.findViewById(R.id.textView)
-        textViewTitle.text = title
+        textViewTitle.text = String.format("%s", "Cerrando Session")
         dialog = builder.create()
         dialog!!.setCanceledOnTouchOutside(false)
         dialog!!.setCancelable(false)
         dialog!!.show()
+    }
+
+    private fun closeLoad() {
+        if (dialog != null) {
+            if (dialog!!.isShowing) {
+                dialog!!.dismiss()
+            }
+        }
     }
 
     private fun changeFragment(fragment: Fragment, title: String) {
@@ -148,14 +157,6 @@ class MainActivity : DaggerAppCompatActivity(), NavigationView.OnNavigationItemS
         }
     }
 
-    private fun closeLoad() {
-        if (dialog != null) {
-            if (dialog!!.isShowing) {
-                dialog!!.dismiss()
-            }
-        }
-    }
-
     private fun message() {
         usuarioViewModel.success.observe(this, Observer<String> { s ->
             if (s != null) {
@@ -175,7 +176,6 @@ class MainActivity : DaggerAppCompatActivity(), NavigationView.OnNavigationItemS
                 Util.snackBarMensaje(window.decorView, s)
             }
         })
-
     }
 
     private fun dialogLogout() {
@@ -184,7 +184,7 @@ class MainActivity : DaggerAppCompatActivity(), NavigationView.OnNavigationItemS
             .setMessage("Deseas Salir ?")
             .setPositiveButton("SI") { dialog, _ ->
                 logout = "on"
-                load("Cerrando Session")
+                load()
                 usuarioViewModel.logout()
                 dialog.dismiss()
             }

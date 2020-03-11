@@ -64,4 +64,10 @@ interface RegistroDetalleDao {
 
     @Query("SELECT * FROM RegistroDetalle WHERE registroId =:id")
     fun getRegistroDetalleFk(id: Int): LiveData<RegistroDetalle>
+
+    @Query("UPDATE RegistroDetalle SET active1 = 1 WHERE detalleId=:id")
+    fun closeRegistroDetalle1(id: Int)
+
+    @Query("UPDATE RegistroDetalle SET active2 = 1 WHERE detalleId=:id")
+    fun closeRegistroDetalle2(id: Int)
 }

@@ -36,4 +36,10 @@ interface VehiculoControlDao {
 
     @Query("SELECT * FROM VehiculoControl WHERE controlId =:id")
     fun getControVehiculoById(id: Int): LiveData<VehiculoControl>
+
+    @Query("SELECT * FROM VehiculoControl WHERE placa =:id")
+    fun getVehiculoControlTaskById(id: String): List<VehiculoControl>
+
+    @Query("UPDATE VehiculoControl SET estado=:i")
+    fun updateEnabledControl(i: Int)
 }

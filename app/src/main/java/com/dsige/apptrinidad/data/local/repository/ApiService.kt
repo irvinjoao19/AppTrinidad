@@ -24,6 +24,10 @@ interface ApiService {
     fun save(@Body body: RequestBody): Observable<Mensaje>
 
     @Headers("Cache-Control: no-cache")
+    @POST("SaveVehiculo")
+    fun saveVehiculo(@Body body: RequestBody): Observable<Mensaje>
+
+    @Headers("Cache-Control: no-cache")
     @POST("Verification")
     fun verification(@Body body: RequestBody): Observable<String>
 

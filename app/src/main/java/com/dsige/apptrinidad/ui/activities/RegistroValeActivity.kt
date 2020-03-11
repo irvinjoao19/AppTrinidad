@@ -185,6 +185,7 @@ class RegistroValeActivity : DaggerAppCompatActivity(), View.OnClickListener, Te
         c.fecha = Util.getFecha()
         c.nombreGrifo = editTextTipoGrifo.text.toString()
         c.nombreTipo = editTextTipoCombustible.text.toString()
+        c.estado = 0
 
         when {
             editTextPrecio.text.toString().isEmpty() -> c.precioIGV = 0.0
