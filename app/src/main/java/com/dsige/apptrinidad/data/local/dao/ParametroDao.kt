@@ -25,8 +25,8 @@ interface ParametroDao {
     @Query("SELECT * FROM Parametro")
     fun getParametro(): Parametro
 
-    @Query("SELECT valor FROM Parametro WHERE configurationId =:id")
-    fun getParametroByIdTask(id: Int): Int
+    @Query("SELECT * FROM Parametro WHERE tipo =:t")
+    fun getComboByTipo(t:Int) : LiveData<List<Parametro>>
 
     @Query("DELETE FROM Parametro")
     fun deleteAll()

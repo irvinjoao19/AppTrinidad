@@ -24,4 +24,20 @@ interface OnItemClickListener {
     interface PhotoListener {
         fun onItemClick(r: RegistroDetalle, view: View, position: Int)
     }
+
+    interface VehiculoListener {
+        fun onItemClick(v: Vehiculo, view: View, position: Int)
+    }
+
+    interface ControlListener {
+        fun onItemClick(c: VehiculoControl, view: View, position: Int)
+    }
+
+    interface ParametroListener {
+        fun onItemClick(p: Parametro, view: View, position: Int)
+    }
+
+    interface ValeListener {
+        fun onItemClick(c: VehiculoVales, view: View, position: Int)
+    }
 }

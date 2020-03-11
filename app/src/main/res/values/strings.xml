@@ -22,10 +22,9 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="tab1">Generales</string>
-    <string name="tab2">CheckList</string>
-    <string name="tab3">Observaciones</string>
-    <string name="tab4">Peligros</string>
+    <string name="tab1">Kilometraje</string>
+    <string name="tab2">Combustible</string>
+    <string name="tab3">Por Vencer</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
@@ -93,4 +92,10 @@
     <string name="reparacion">Reparación Veredas</string>
     <string name="work">Trabajos SS</string>
     <string name="imagen">Imagen</string>
+    <string name="agregar_kilometraje">Agregar Kilometraje</string>
+    <string name="km">km</string>
+    <string name="km_salida">Salida :</string>
+    <string name="km_entrada">Entrada :</string>
+    <string name="texto">texto</string>
+    <string name="ingrese_kilometraje">Ingrese el Kilometraje</string>
 </resources>

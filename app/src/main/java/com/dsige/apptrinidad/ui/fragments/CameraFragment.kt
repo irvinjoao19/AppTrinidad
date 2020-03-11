@@ -1,6 +1,7 @@
 package com.dsige.apptrinidad.ui.fragments
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -739,17 +740,28 @@ class CameraFragment : Fragment(), View.OnClickListener, View.OnTouchListener {
                 override fun onCaptureCompleted(
                     s: CameraCaptureSession, request: CaptureRequest, result: TotalCaptureResult
                 ) {
-
-                    startActivity(
-                        Intent(context!!, PreviewCameraActivity::class.java)
-                            .putExtra("nameImg", nameImg)
-                            .putExtra("tipo", tipo)
-                            .putExtra("usuarioId", usuarioId)
-                            .putExtra("id", registroId)
-                            .putExtra("detalleId", detalleId)
-                            .putExtra("tipoDetalle", tipoDetalle)
-                    )
-                    activity!!.finish()
+                    if (tipo == 0) {
+                        startActivityForResult(
+                            Intent(context!!, PreviewCameraActivity::class.java)
+                                .putExtra("nameImg", nameImg)
+                                .putExtra("tipo", tipo)
+                                .putExtra("usuarioId", usuarioId)
+                                .putExtra("id", registroId)
+                                .putExtra("detalleId", detalleId)
+                                .putExtra("tipoDetalle", tipoDetalle), 1
+                        )
+                    } else {
+                        startActivity(
+                            Intent(context!!, PreviewCameraActivity::class.java)
+                                .putExtra("nameImg", nameImg)
+                                .putExtra("tipo", tipo)
+                                .putExtra("usuarioId", usuarioId)
+                                .putExtra("id", registroId)
+                                .putExtra("detalleId", detalleId)
+                                .putExtra("tipoDetalle", tipoDetalle)
+                        )
+                        activity!!.finish()
+                    }
                     unlockFocus()
                 }
             }
@@ -932,7 +944,7 @@ class CameraFragment : Fragment(), View.OnClickListener, View.OnTouchListener {
         }
 
         @JvmStatic
-        fun newInstance(param1: Int, param2: String, param3: Int, param4: Int,param5: Int) =
+        fun newInstance(param1: Int, param2: String, param3: Int, param4: Int, param5: Int) =
             CameraFragment().apply {
                 arguments = Bundle().apply {
                     putInt(ARG_PARAM1, param1)
@@ -968,6 +980,19 @@ class CameraFragment : Fragment(), View.OnClickListener, View.OnTouchListener {
             openCamera(textureView.width, textureView.height)
         } else {
             textureView.surfaceTextureListener = surfaceTextureListener
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 1) {
+            if (resultCode == Activity.RESULT_OK) {
+                val result = data!!.getStringExtra("img")!!
+                if (result.isNotEmpty()) {
+                    activity!!.setResult(Activity.RESULT_OK, Intent().putExtra("img", result))
+                    activity!!.finish()
+                }
+            }
         }
     }
 }

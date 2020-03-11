@@ -19,6 +19,7 @@ import com.dsige.apptrinidad.data.viewModel.UsuarioViewModel
 import com.dsige.apptrinidad.data.viewModel.ViewModelFactory
 import com.dsige.apptrinidad.helper.Util
 import com.dsige.apptrinidad.ui.fragments.MainFragment
+import com.dsige.apptrinidad.ui.fragments.VehicleFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
 import dagger.android.support.DaggerAppCompatActivity
@@ -78,6 +79,7 @@ class MainActivity : DaggerAppCompatActivity(), NavigationView.OnNavigationItemS
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
+            R.id.vehiculos -> changeFragment(VehicleFragment.newInstance("", ""), "Vehiculos")
             R.id.reparacion -> changeFragment(
                 MainFragment.newInstance(1, usuarioId),
                 "Reparación de Veredas"
@@ -146,7 +148,7 @@ class MainActivity : DaggerAppCompatActivity(), NavigationView.OnNavigationItemS
         }
     }
 
-    private fun closeLoad(){
+    private fun closeLoad() {
         if (dialog != null) {
             if (dialog!!.isShowing) {
                 dialog!!.dismiss()
@@ -162,8 +164,8 @@ class MainActivity : DaggerAppCompatActivity(), NavigationView.OnNavigationItemS
                     val intent = Intent(this@MainActivity, LoginActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(intent)
-                }else{
-                    Util.toastMensaje(this,s)
+                } else {
+                    Util.toastMensaje(this, s)
                 }
             }
         })

@@ -611,7 +611,10 @@ object Util {
         datePickerDialog.show()
     }
 
-
+    /**
+     * Example
+     * textView.setText(Util.getTextHTML("<strong>Km Salida :</strong>\n" + c.kmSalida),TextView.BufferType.SPANNABLE)     *
+     */
     fun getTextHTML(html: String): Spanned {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             Html.fromHtml(html, Html.FROM_HTML_OPTION_USE_CSS_COLORS)

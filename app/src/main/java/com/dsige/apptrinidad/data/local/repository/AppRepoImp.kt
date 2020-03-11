@@ -75,27 +75,21 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         }
     }
 
-    override fun getParametroById(id: Int): Int {
-        return dataBase.parametroDao().getParametroByIdTask(id)
-    }
-
-    override fun getSync(operarioId: Int, version: String): Observable<Sync> {
-        return apiService.getSync(operarioId, version)
+    override fun getSync(id: String, version: String): Observable<Sync> {
+        return apiService.getSync()
     }
 
     override fun saveSync(s: Sync): Completable {
         return Completable.fromAction {
-
-            val p: List<Parametro>? = s.parametros
+            val p: List<Vehiculo>? = s.vehiculos
             if (p != null) {
-                dataBase.parametroDao().insertParametroListTask(p)
+                dataBase.vehiculoDao().insertVehiculoListTask(p)
             }
 
-            val m: List<Servicio>? = s.servicios
-            if (m != null) {
-                dataBase.servicioDao().insertServicioListTask(m)
+            val c: List<Parametro>? = s.parametros
+            if (c != null) {
+                dataBase.parametroDao().insertParametroListTask(c)
             }
-
         }
     }
 
@@ -141,7 +135,7 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
 
     override fun updateRegistro(m: Mensaje): Completable {
         return Completable.fromAction {
-            dataBase.registroDao().updateRegistroEstado(m.codigoBase)
+            dataBase.registroDao().updateRegistroEstado(m.codigoBase, m.codigoRetorno)
             dataBase.registroDetalleDao().updateRegistroPhotoEstado(m.codigoBase)
         }
     }
@@ -298,5 +292,51 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
 
     override fun getRegistroDetalleById(id: Int): LiveData<List<RegistroDetalle>> {
         return dataBase.registroDetalleDao().getRegistroDetalleByRegistroId(id)
+    }
+
+    override fun populateVehiculo(): LiveData<List<Vehiculo>> {
+        return dataBase.vehiculoDao().getVehiculo()
+    }
+
+    override fun getVehiculo(placa: String): LiveData<Vehiculo> {
+        return dataBase.vehiculoDao().getVehiculoById(placa)
+    }
+
+    override fun getControlVehiculo(placa: String): LiveData<List<VehiculoControl>> {
+        return dataBase.vehiculoControlDao().getControlVehiculo(placa)
+    }
+
+    override fun saveControl(v: VehiculoControl): Completable {
+        return Completable.fromAction {
+            if (v.controlId == 0) {
+                dataBase.vehiculoControlDao().insertVehiculoControlTask(v)
+            } else
+                dataBase.vehiculoControlDao().updateVehiculoControlTask(v)
+        }
+    }
+
+    override fun getControVehiculoById(controlId: Int): LiveData<VehiculoControl> {
+        return dataBase.vehiculoControlDao().getControVehiculoById(controlId)
+    }
+
+    override fun getComboByTipo(tipo: Int): LiveData<List<Parametro>> {
+        return dataBase.parametroDao().getComboByTipo(tipo)
+    }
+
+    override fun saveVales(c: VehiculoVales): Completable {
+        return Completable.fromAction {
+            if (c.valeId == 0) {
+                dataBase.vehiculoValesDao().insertVehiculoValesTask(c)
+            } else
+                dataBase.vehiculoValesDao().updateVehiculoValesTask(c)
+        }
+    }
+
+    override fun getValeVehiculo(placa: String): LiveData<List<VehiculoVales>> {
+        return dataBase.vehiculoValesDao().getValeVehiculo(placa)
+    }
+
+    override fun getValeVehiculoById(id: Int): LiveData<VehiculoVales> {
+        return dataBase.vehiculoValesDao().getValeVehiculoById(id)
     }
 }

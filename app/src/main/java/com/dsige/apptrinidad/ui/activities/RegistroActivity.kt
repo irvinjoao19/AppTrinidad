@@ -22,7 +22,9 @@ import com.dsige.apptrinidad.ui.listeners.OnItemClickListener
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.android.support.DaggerAppCompatActivity
 import kotlinx.android.synthetic.main.activity_registro.*
+import java.util.*
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 class RegistroActivity : DaggerAppCompatActivity(), View.OnClickListener, TextWatcher {
 
@@ -110,7 +112,7 @@ class RegistroActivity : DaggerAppCompatActivity(), View.OnClickListener, TextWa
         recyclerView.setHasFixedSize(true)
         recyclerView.adapter = photoAdapter
 
-        registroViewModel.getRegistroById(id).observe(this, Observer<Registro> { re ->
+        registroViewModel.getRegistroById(id).observe(this, Observer { re ->
             if (re != null) {
                 r = re
                 editTextObra.setText(re.nroObra)
@@ -124,7 +126,7 @@ class RegistroActivity : DaggerAppCompatActivity(), View.OnClickListener, TextWa
             }
         })
 
-        registroViewModel.mensajeSuccess.observe(this, Observer<String> { s ->
+        registroViewModel.mensajeSuccess.observe(this, Observer { s ->
             if (s != null) {
                 if (count == 3) {
                     Util.toastMensaje(this, "Maximo 3 fotos")
@@ -136,7 +138,7 @@ class RegistroActivity : DaggerAppCompatActivity(), View.OnClickListener, TextWa
             }
         })
 
-        registroViewModel.mensajeError.observe(this, Observer<String> { s ->
+        registroViewModel.mensajeError.observe(this, Observer { s ->
             if (s != null) {
                 Util.toastMensaje(this, s)
             }
@@ -151,6 +153,7 @@ class RegistroActivity : DaggerAppCompatActivity(), View.OnClickListener, TextWa
                     editTextLargo.setText(d.largo.toString())
                     editTextAncho.setText(d.ancho.toString())
                     editTextM3.setText(d.totalM3.toString())
+                    editTextObservacion.setText(d.observacion)
                     count = 0
                     if (tipoDetalle == 1) {
                         val a = ArrayList<MenuPrincipal>()
@@ -188,7 +191,7 @@ class RegistroActivity : DaggerAppCompatActivity(), View.OnClickListener, TextWa
     }
 
     private fun formRegistro(tipo: String) {
-        r.nroObra = editTextObra.text.toString()
+        r.nroObra = editTextObra.text.toString().toUpperCase(Locale.getDefault())
         r.nroPoste = editTextPoste.text.toString()
         r.fecha = Util.getFecha()
         r.punto = editTextNombrePunto.text.toString().trim()
@@ -199,7 +202,7 @@ class RegistroActivity : DaggerAppCompatActivity(), View.OnClickListener, TextWa
         d.tipo = if (checkbox.isChecked) 2 else 1
         d.registroId = registroId
         d.detalleId = detalleId
-
+        d.observacion = editTextObservacion.text.toString().trim()
 
         when {
             editTextAncho.text.toString().isEmpty() -> d.ancho = 0.0

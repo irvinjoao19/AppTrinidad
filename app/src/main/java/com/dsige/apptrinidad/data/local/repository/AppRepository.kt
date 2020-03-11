@@ -31,9 +31,7 @@ interface AppRepository {
 
     fun deleteTotal(): Completable
 
-    fun getParametroById(id: Int): Int
-
-    fun getSync(operarioId: Int, version: String): Observable<Sync>
+    fun getSync(id: String, version: String): Observable<Sync>
 
     fun saveSync(s: Sync): Completable
 
@@ -69,7 +67,7 @@ interface AppRepository {
 
     // TODO REGISTRO
 
-    fun insertOrUpdateRegistro(r: Registro,id:Int): Completable
+    fun insertOrUpdateRegistro(r: Registro, id: Int): Completable
 
     fun insertOrUpdateRegistroPhoto(p: RegistroDetalle): Completable
 
@@ -87,11 +85,29 @@ interface AppRepository {
 
     fun getRegistroByObra(o: String): LiveData<List<Registro>>
 
-    fun getDetalleIdentity() : LiveData<Int>
+    fun getDetalleIdentity(): LiveData<Int>
 
-    fun updatePhoto(tipo:Int,name:String,detalleId:Int,id:Int) : Completable
+    fun updatePhoto(tipo: Int, name: String, detalleId: Int, id: Int): Completable
 
-    fun getRegistroDetalle(tipo:Int,id: Int): LiveData<RegistroDetalle>
+    fun getRegistroDetalle(tipo: Int, id: Int): LiveData<RegistroDetalle>
 
     fun getRegistroDetalleById(id: Int): LiveData<List<RegistroDetalle>>
+
+    fun populateVehiculo(): LiveData<List<Vehiculo>>
+
+    fun getVehiculo(placa: String): LiveData<Vehiculo>
+
+    fun getControlVehiculo(placa: String): LiveData<List<VehiculoControl>>
+
+    fun saveControl(v: VehiculoControl): Completable
+
+    fun getControVehiculoById(controlId: Int): LiveData<VehiculoControl>
+
+    fun getComboByTipo(tipo: Int): LiveData<List<Parametro>>
+
+    fun saveVales(c: VehiculoVales): Completable
+
+    fun getValeVehiculo(placa: String): LiveData<List<VehiculoVales>>
+
+    fun getValeVehiculoById(id: Int): LiveData<VehiculoVales>
 }

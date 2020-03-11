@@ -41,8 +41,8 @@ interface RegistroDao {
     @Query("DELETE FROM Registro")
     fun deleteAll()
 
-    @Query("UPDATE Registro SET active = 2 WHERE registroId =:id")
-    fun updateRegistroEstado(id: Int)
+    @Query("UPDATE Registro SET active = 0 , identity=:retorno WHERE registroId =:id")
+    fun updateRegistroEstado(id: Int, retorno: Int)
 
     @Query("UPDATE Registro SET estado =:e")
     fun updateRegistroMasivoEstado(e: Int)

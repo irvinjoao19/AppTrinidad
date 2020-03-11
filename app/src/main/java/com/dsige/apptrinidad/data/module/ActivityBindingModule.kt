@@ -25,4 +25,13 @@ abstract class ActivityBindingModule {
 
     @ContributesAndroidInjector
     internal abstract fun bindDetailActivity(): DetailActivity
+
+    @ContributesAndroidInjector(modules = [FragmentBindingModule.Vehiculo::class])
+    internal abstract fun bindVehicleRegisterActivity(): VehicleRegisterActivity
+
+    @ContributesAndroidInjector
+    internal abstract fun bindControlActivity(): ControlActivity
+
+    @ContributesAndroidInjector
+    internal abstract fun bindRegistroValeActivity(): RegistroValeActivity
 }

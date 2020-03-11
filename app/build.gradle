@@ -74,6 +74,7 @@ dependencies {
     implementation 'com.github.nikartm:image-support:1.0.5'
 
     implementation 'com.getbase:floatingactionbutton:1.10.1'
+    implementation 'pl.pawelkleczkowski.customgauge:CustomGauge:1.0.4'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'

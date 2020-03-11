@@ -54,4 +54,22 @@ class DataBaseModule {
     internal fun provideServicioDao(appDataBase: AppDataBase): ServicioDao {
         return appDataBase.servicioDao()
     }
+
+
+    @Provides
+    internal fun provideVehiculoDao(appDataBase: AppDataBase): VehiculoDao {
+        return appDataBase.vehiculoDao()
+    }
+
+
+    @Provides
+    internal fun provideVehiculoControlDao(appDataBase: AppDataBase): VehiculoControlDao {
+        return appDataBase.vehiculoControlDao()
+    }
+
+
+    @Provides
+    internal fun provideVehiculoValesDao(appDataBase: AppDataBase): VehiculoValesDao {
+        return appDataBase.vehiculoValesDao()
+    }
 }

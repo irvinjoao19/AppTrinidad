@@ -1,5 +1,6 @@
 package com.dsige.apptrinidad.ui.activities
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -18,12 +19,20 @@ import kotlinx.android.synthetic.main.activity_preview_camera.*
 import java.io.File
 import javax.inject.Inject
 
+
 class PreviewCameraActivity : DaggerAppCompatActivity(), View.OnClickListener {
 
     override fun onClick(v: View) {
         when (v.id) {
-            R.id.fabOk -> registroViewModel.updateFoto(tipoDetalle, nameImg, detalleId,registroId)
-            R.id.fabClose -> {
+            R.id.fabOk -> if (tipo == 0) {
+                setResult(Activity.RESULT_OK, Intent().putExtra("img", nameImg))
+                finish()
+            } else
+                registroViewModel.updateFoto(tipoDetalle, nameImg, detalleId, registroId)
+            R.id.fabClose -> if (tipo == 0) {
+                setResult(Activity.RESULT_CANCELED, Intent())
+                finish()
+            } else {
                 startActivity(Intent(this, CameraActivity::class.java))
                 finish()
             }
@@ -78,29 +87,31 @@ class PreviewCameraActivity : DaggerAppCompatActivity(), View.OnClickListener {
                 })
         }, 200)
 
-        if (id == 0) {
-            registroViewModel.getIdentity().observe(this, Observer<Int> { i ->
-                registroId = i
-            })
-        } else {
-            registroId = id
+        if (tipo != 0){
+            if (id == 0) {
+                registroViewModel.getIdentity().observe(this, Observer<Int> { i ->
+                    registroId = i
+                })
+            } else {
+                registroId = id
+            }
+
+            if (dId == 0) {
+                registroViewModel.getDetalleIdentity().observe(this, Observer<Int> { i ->
+                    detalleId = i
+                })
+            } else {
+                detalleId = dId
+            }
         }
 
-        if (dId == 0) {
-            registroViewModel.getDetalleIdentity().observe(this, Observer<Int> { i ->
-                detalleId = i
-            })
-        } else {
-            detalleId = dId
-        }
-
-        registroViewModel.mensajeError.observe(this, Observer<String> { s ->
+        registroViewModel.mensajeError.observe(this, Observer { s ->
             if (s != null) {
                 Util.toastMensaje(this, s)
             }
         })
 
-        registroViewModel.mensajeSuccess.observe(this, Observer<String> { s ->
+        registroViewModel.mensajeSuccess.observe(this, Observer { s ->
             if (s != null) {
                 if (tipo == 3) {
                     finish()

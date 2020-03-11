@@ -16,7 +16,8 @@ interface ApiService {
 
     @Headers("Cache-Control: no-cache")
     @GET("Sync")
-    fun getSync(@Query("operarioId") operarioId: Int, @Query("version") version: String ): Observable<Sync>
+    fun getSync(): Observable<Sync>
+//    fun getSync(@Query("operarioId") operarioId: Int, @Query("version") version: String ): Observable<Sync>
 
     @Headers("Cache-Control: no-cache")
     @POST("SaveRegistro")

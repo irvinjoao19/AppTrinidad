@@ -3,17 +3,20 @@ package com.dsige.apptrinidad.ui.adapters
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
+import com.dsige.apptrinidad.ui.fragments.VehicleCombustibleFragment
+import com.dsige.apptrinidad.ui.fragments.VehicleGeneralFragment
+import com.dsige.apptrinidad.ui.fragments.VehiclePorVencerFragment
 
 abstract class TabLayoutAdapter {
 
-    class TabLayoutCheckListAdapter(fm: FragmentManager, private val numberOfTabs: Int, var inspeccionId: Int, var usuarioId: Int, var name: String)
-        : FragmentStatePagerAdapter(fm, numberOfTabs) {
+    class TabLayoutRegister(fm: FragmentManager, private val numberOfTabs: Int,private val id : String) :
+        FragmentStatePagerAdapter(fm, numberOfTabs) {
 
         override fun getItem(position: Int): Fragment {
             return when (position) {
-//                0 -> GeneralFragment.newInstance(inspeccionId, usuarioId, name)
-//                1 -> CheckListFragment.newInstance(inspeccionId, usuarioId)
-//                2 -> ObservationFragment.newInstance(inspeccionId,usuarioId)
+                0 -> VehicleGeneralFragment.newInstance(id)
+                1 -> VehicleCombustibleFragment.newInstance(id)
+                2 -> VehiclePorVencerFragment.newInstance("","")
                 else -> Fragment()
             }
         }

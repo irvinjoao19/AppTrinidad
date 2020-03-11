@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.dsige.apptrinidad.data.local.model.Registro
 import com.dsige.apptrinidad.data.local.model.RegistroDetalle
+import com.dsige.apptrinidad.data.local.model.Sync
 import com.dsige.apptrinidad.data.local.model.Usuario
 import com.dsige.apptrinidad.data.local.repository.ApiError
 import com.dsige.apptrinidad.data.local.repository.AppRepository
@@ -60,7 +61,7 @@ internal constructor(private val roomRepository: AppRepository, private val retr
                 }
 
                 override fun onNext(usuario: Usuario) {
-                    insertUsuario(usuario)
+                    insertUsuario(usuario,version)
                 }
 
                 override fun onError(t: Throwable) {
@@ -82,9 +83,52 @@ internal constructor(private val roomRepository: AppRepository, private val retr
             })
     }
 
-    fun insertUsuario(u: Usuario) {
+    fun insertUsuario(u: Usuario,v:String) {
         roomRepository.insertUsuario(u)
             .delay(3, TimeUnit.SECONDS)
+            .subscribeOn(Schedulers.computation())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : CompletableObserver {
+                override fun onSubscribe(d: Disposable) {
+                }
+
+                override fun onComplete() {
+                    sync(u.usuarioId,v)
+                }
+
+                override fun onError(e: Throwable) {
+                    mensajeError.value = e.toString()
+                }
+            })
+    }
+
+
+    private fun sync(id:String,v:String){
+        roomRepository.getSync(id,v)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : Observer<Sync> {
+                override fun onComplete() {
+
+                }
+
+                override fun onSubscribe(d: Disposable) {
+
+                }
+
+                override fun onNext(t: Sync) {
+                    saveSync(t)
+                }
+
+                override fun onError(e: Throwable) {
+
+                }
+
+            })
+    }
+
+    private fun saveSync(s:Sync){
+        roomRepository.saveSync(s)
             .subscribeOn(Schedulers.computation())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(object : CompletableObserver {
@@ -125,7 +169,7 @@ internal constructor(private val roomRepository: AppRepository, private val retr
     }
 
     fun sendData(context: Context) {
-        val auditorias: Observable<List<Registro>> = roomRepository.getDataRegistro(0)
+        val auditorias: Observable<List<Registro>> = roomRepository.getDataRegistro(1)
         auditorias.flatMap { observable ->
             Observable.fromIterable(observable).flatMap { a ->
                 val b = MultipartBody.Builder()
@@ -257,8 +301,7 @@ internal constructor(private val roomRepository: AppRepository, private val retr
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(object : CompletableObserver {
                 override fun onComplete() {
-                    Log.i("TAG", "ENVIOS ACTUALIZADOS")
-                    mensajeSuccess.value = "Ok"
+                    mensajeSuccess.value = messages.mensaje
                 }
 
                 override fun onSubscribe(d: Disposable) {

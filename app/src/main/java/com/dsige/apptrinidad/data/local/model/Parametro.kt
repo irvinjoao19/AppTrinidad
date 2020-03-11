@@ -6,9 +6,9 @@ import androidx.room.PrimaryKey
 @Entity
 open class Parametro {
 
-    @PrimaryKey(autoGenerate = true)
-    var configurationId: Int = 0
-    var nombre: String = ""
-    var valor: Int = 0
+    @PrimaryKey
+    var campo1: String = ""
+    var tipo: Int = 0 //1 -> grifo 2-> combustible
+    var campo2: String = ""
 
 }
