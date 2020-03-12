@@ -47,6 +47,20 @@ class VehiculoAdapter(private val listener: OnItemClickListener.VehiculoListener
             textViewObservacion.text = v.tipoVehiculo
             textViewTipoGasolina.text = v.combustible
             textViewEstado.text = v.condicion
+
+            if (v.estado == 0) {
+                imageViewCar.setImageDrawable(
+                    itemView.resources.getDrawable(
+                        R.drawable.ic_open_lock, itemView.resources.newTheme()
+                    )
+                )
+            }else
+                imageViewCar.setImageDrawable(
+                    itemView.resources.getDrawable(
+                        R.drawable.ic_close_lock, itemView.resources.newTheme()
+                    )
+                )
+
 //            textViewEstado.setTextColor(Color.parseColor(v.colorEstado))
             itemView.setOnClickListener { view -> listener.onItemClick(v, view, adapterPosition) }
         }

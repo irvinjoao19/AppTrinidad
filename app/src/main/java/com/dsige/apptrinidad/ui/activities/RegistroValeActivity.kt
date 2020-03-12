@@ -81,7 +81,6 @@ class RegistroValeActivity : DaggerAppCompatActivity(), View.OnClickListener, Te
         imageViewFoto.setOnClickListener(this)
         fabSave.setOnClickListener(this)
         editTextFecha.setText(Util.getFecha())
-        editTextVoucher.setText(placa)
         editTextCantidad.addTextChangedListener(this)
         editTextPrecio.addTextChangedListener(this)
 

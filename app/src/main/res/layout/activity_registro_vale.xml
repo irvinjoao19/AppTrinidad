@@ -23,7 +23,6 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="100dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -246,12 +245,12 @@
                     android:id="@+id/imageViewFoto"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
                     android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:contentDescription="@string/img"
                     app:layout_constraintStart_toStartOf="@+id/guideline"
                     app:layout_constraintTop_toBottomOf="@id/editTextTipoGrifo"
-                    app:srcCompat="@drawable/ic_galery"
-                    android:contentDescription="@string/img" />
+                    app:srcCompat="@drawable/ic_galery" />
 
                 <androidx.constraintlayout.widget.Guideline
                     android:id="@+id/guideline"
@@ -270,21 +269,24 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/layoutPrincipal" />
+
+            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                android:id="@+id/fabSave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|bottom"
+                android:layout_margin="16dp"
+                android:text="@string/save"
+                android:textColor="@color/colorWhite"
+                android:textStyle="bold"
+                app:backgroundTint="@color/colorAccent"
+                app:icon="@drawable/ic_save"
+                app:iconGravity="end"
+                app:iconTint="@color/colorWhite"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imageView" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
-
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/fabSave"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center|bottom"
-        android:layout_margin="16dp"
-        android:text="@string/save"
-        android:textColor="@color/colorWhite"
-        android:textStyle="bold"
-        android:visibility="gone"
-        app:backgroundTint="@color/colorAccent"
-        app:icon="@drawable/ic_save"
-        app:iconGravity="end"
-        app:iconTint="@color/colorWhite" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

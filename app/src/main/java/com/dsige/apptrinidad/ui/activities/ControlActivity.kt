@@ -52,7 +52,6 @@ class ControlActivity : DaggerAppCompatActivity(), View.OnClickListener {
         c.controlId = controlId
         c.placa = placa
         c.fecha = Util.getFecha()
-        c.estado = 0
 
         vehiculoViewModel.getControVehiculoById(controlId)
             .observe(this, Observer { v ->
@@ -75,7 +74,6 @@ class ControlActivity : DaggerAppCompatActivity(), View.OnClickListener {
     }
 
     private fun formControl() {
-
         when (c.controlId) {
             0 -> when {
                 editTextKm.text.toString().isEmpty() -> c.kmSalida = 0.0
@@ -83,10 +81,11 @@ class ControlActivity : DaggerAppCompatActivity(), View.OnClickListener {
             }
             else -> when {
                 editTextKm.text.toString().isEmpty() -> c.kmIngreso = 0.0
-                else -> c.kmIngreso = editTextKm.text.toString().toDouble()
+                else -> {
+                    c.kmIngreso = editTextKm.text.toString().toDouble()
+                }
             }
         }
-
         vehiculoViewModel.validateControl(c)
     }
 }

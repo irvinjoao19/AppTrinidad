@@ -55,7 +55,7 @@ class VehicleGeneralFragment : DaggerFragment() {
 
         val controlAdapter = ControlVehiculoAdapter(object : OnItemClickListener.ControlListener {
             override fun onItemClick(c: VehiculoControl, view: View, position: Int) {
-                if (c.kmIngreso == 0.0) {
+                if (c.estado == 0) {
                     startActivity(
                         Intent(context, ControlActivity::class.java)
                             .putExtra("id", c.controlId)

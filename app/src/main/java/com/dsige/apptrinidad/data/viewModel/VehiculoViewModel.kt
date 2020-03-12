@@ -9,10 +9,12 @@ import com.dsige.apptrinidad.data.local.model.VehiculoControl
 import com.dsige.apptrinidad.data.local.model.VehiculoVales
 import com.dsige.apptrinidad.data.local.repository.AppRepository
 import io.reactivex.CompletableObserver
+import io.reactivex.Observer
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class VehiculoViewModel @Inject
@@ -149,5 +151,29 @@ internal constructor(private val roomRepository: AppRepository) :
 
     fun getValeVehiculoById(id: Int): LiveData<VehiculoVales> {
         return roomRepository.getValeVehiculoById(id)
+    }
+
+    fun closeVerificationVehiculo(placa: String) {
+        roomRepository.closeVerificationVehiculo(placa)
+            .delay(1000, TimeUnit.MILLISECONDS)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : Observer<String> {
+                override fun onComplete() {
+
+                }
+
+                override fun onSubscribe(d: Disposable) {
+
+                }
+
+                override fun onNext(t: String) {
+                    mensajeSuccess.value = t
+                }
+
+                override fun onError(e: Throwable) {
+                    mensajeError.value = e.message
+                }
+            })
     }
 }

@@ -116,4 +116,6 @@ interface AppRepository {
     fun validarRegistro(registroId: Int) : Observable<Int>
 
     fun updateVehiculo(messages: Mensaje): Completable
+
+    fun closeVerificationVehiculo(placa: String): Observable<String>
 }

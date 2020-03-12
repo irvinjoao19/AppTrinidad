@@ -100,4 +100,5 @@
     <string name="ingrese_kilometraje">Ingrese el Kilometraje</string>
     <string name="texto_envio2">Envios de Reparación y Trabajos</string>
     <string name="texto_envio1">Enviar Vehiculos</string>
+    <string name="close">Cerrar</string>
 </resources>

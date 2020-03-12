@@ -36,4 +36,7 @@ interface VehiculoDao {
 
     @Query("UPDATE Vehiculo SET estado =:e")
     fun updateEnabledVehiculo(e: Int)
+
+    @Query("UPDATE Vehiculo SET estado =1 WHERE placa =:p")
+    fun updateEnabledVehiculoByPlaca(p: String)
 }

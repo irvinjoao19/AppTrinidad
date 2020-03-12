@@ -326,8 +326,11 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         return Completable.fromAction {
             if (v.controlId == 0) {
                 dataBase.vehiculoControlDao().insertVehiculoControlTask(v)
-            } else
+            } else {
+                v.estado = 1
                 dataBase.vehiculoControlDao().updateVehiculoControlTask(v)
+            }
+
         }
     }
 
@@ -385,7 +388,6 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
                         count++
                     }
                 }
-
                 if (size == count) {
                     emitter.onNext(1)
                 } else
@@ -393,16 +395,52 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
             } else {
                 emitter.onNext(3)
             }
-
             emitter.onComplete()
         }
     }
 
     override fun updateVehiculo(messages: Mensaje): Completable {
         return Completable.fromAction {
-            dataBase.vehiculoDao().updateEnabledVehiculo(1)
+            dataBase.vehiculoDao().updateEnabledVehiculo(2)
             dataBase.vehiculoValesDao().updateEnabledVale(0)
             dataBase.vehiculoControlDao().updateEnabledControl(0)
+        }
+    }
+
+    override fun closeVerificationVehiculo(placa: String): Observable<String> {
+        return Observable.create { emitter ->
+            val va: List<VehiculoVales> = dataBase.vehiculoValesDao().getVehiculoValeTaskById(placa)
+            if (va.isEmpty()) {
+                emitter.onError(Throwable("No hay registros en Combustibles"))
+                emitter.onComplete()
+                return@create
+            }
+            val v: List<VehiculoControl> =
+                dataBase.vehiculoControlDao().getVehiculoControlTaskById(placa)
+            if (v.isNotEmpty()) {
+                var count = 0
+                val size = v.size
+                for (r: VehiculoControl in v) {
+                    if (r.estado == 1) {
+                        count++
+                    }
+                }
+                if (size == count) {
+                    dataBase.vehiculoDao().updateEnabledVehiculoByPlaca(placa)
+                    emitter.onNext("Cerrado")
+                    emitter.onComplete()
+                    return@create
+                } else {
+                    emitter.onError(Throwable("Cerrar Kilometraje"))
+                    emitter.onComplete()
+                    return@create
+                }
+            } else {
+                emitter.onError(Throwable("No hay registros en Kilometraje"))
+                emitter.onComplete()
+                return@create
+            }
+
         }
     }
 }
