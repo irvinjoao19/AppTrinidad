@@ -19,7 +19,6 @@ import kotlinx.android.synthetic.main.activity_preview_camera.*
 import java.io.File
 import javax.inject.Inject
 
-
 class PreviewCameraActivity : DaggerAppCompatActivity(), View.OnClickListener {
 
     override fun onClick(v: View) {

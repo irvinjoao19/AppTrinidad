@@ -7,16 +7,18 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.*
 import android.hardware.camera2.*
+import android.media.Image
 import android.media.ImageReader
-import android.os.Bundle
-import android.os.Handler
-import android.os.HandlerThread
+import android.os.*
 import android.util.Log
 import android.util.Size
 import android.util.SparseIntArray
 import android.view.*
 import androidx.fragment.app.Fragment
-
+import com.dsige.apptrinidad.R
+import com.dsige.apptrinidad.helper.ImageSaver
+import com.dsige.apptrinidad.helper.Util
+import com.dsige.apptrinidad.ui.activities.PreviewCameraActivity
 import kotlinx.android.synthetic.main.fragment_camera.*
 import java.io.File
 import java.lang.Long.signum
@@ -24,13 +26,6 @@ import java.util.*
 import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
-import android.hardware.camera2.CaptureRequest
-import android.hardware.camera2.CameraCaptureSession
-import android.hardware.camera2.CameraCharacteristics
-import com.dsige.apptrinidad.R
-import com.dsige.apptrinidad.helper.ImageSaver
-import com.dsige.apptrinidad.helper.Util
-import com.dsige.apptrinidad.ui.activities.PreviewCameraActivity
 import kotlin.math.sqrt
 
 private const val ARG_PARAM1 = "param1"
@@ -229,7 +224,13 @@ class CameraFragment : Fragment(), View.OnClickListener, View.OnTouchListener {
      * still image is ready to be saved.
      */
     private val onImageAvailableListener = ImageReader.OnImageAvailableListener {
-        backgroundHandler?.post(ImageSaver(it.acquireNextImage(), file))
+        val img: Image? = it.acquireLatestImage()
+        if (img != null) {
+            backgroundHandler?.post(ImageSaver(img, file))
+        } else {
+            img?.close()
+            return@OnImageAvailableListener
+        }
     }
 
     /**
@@ -408,12 +409,26 @@ class CameraFragment : Fragment(), View.OnClickListener, View.OnTouchListener {
                     listOf(*map.getOutputSizes(ImageFormat.JPEG)),
                     CompareSizesByArea()
                 )
-                imageReader = ImageReader.newInstance(
-//                    largest.width, largest.height,
-                    640, 480,   // largest.width, largest.height,
-                    ImageFormat.JPEG, /*maxImages*/ 1
-                ).apply {
-                    setOnImageAvailableListener(onImageAvailableListener, backgroundHandler)
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    imageReader = ImageReader.newInstance(
+                        640,
+                        480,
+                        ImageFormat.JPEG,
+                        2,
+                        1000
+                    ).apply {
+                        setOnImageAvailableListener(onImageAvailableListener, backgroundHandler)
+                    }
+                } else {
+                    imageReader = ImageReader.newInstance(
+                        640,
+                        480,
+                        ImageFormat.JPEG,
+                        1
+                    ).apply {
+                        setOnImageAvailableListener(onImageAvailableListener, backgroundHandler)
+                    }
                 }
 
                 // Find out if we need to swap dimension to get the preview size relative to sensor
@@ -542,7 +557,7 @@ class CameraFragment : Fragment(), View.OnClickListener, View.OnTouchListener {
      */
     private fun startBackgroundThread() {
         backgroundThread = HandlerThread("CameraBackground").also { it.start() }
-        backgroundHandler = Handler(backgroundThread?.looper)
+        backgroundHandler = Handler(backgroundThread!!.looper)
     }
 
     /**
@@ -886,7 +901,7 @@ class CameraFragment : Fragment(), View.OnClickListener, View.OnTouchListener {
         /**
          * Max preview height that is guaranteed by Camera2 API
          */
-        private val MAX_PREVIEW_HEIGHT = 1180 //1080
+        private val MAX_PREVIEW_HEIGHT = 1080 //1180 //1080
 
         /**
          * Given `choices` of `Size`s supported by a camera, choose the smallest one that

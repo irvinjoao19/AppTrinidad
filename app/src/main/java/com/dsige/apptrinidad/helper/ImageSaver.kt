@@ -16,7 +16,6 @@ internal class ImageSaver(
      */
     private val file: File
 ) : Runnable {
-
     override fun run() {
         val buffer = image.planes[0].buffer
         val bytes = ByteArray(buffer.remaining())

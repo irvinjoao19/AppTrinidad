@@ -193,7 +193,6 @@ object Util {
         }
     }
 
-
     private fun comprimirImagen(PathFile: String): Boolean {
         return try {
             val result = getRightAngleImage(PathFile)
@@ -836,18 +835,15 @@ object Util {
             newCanvas.drawBitmap(bm1, 0f, 0f, null)
 
             if (captionString != null) {
-
                 val paintText = Paint(Paint.ANTI_ALIAS_FLAG)
                 paintText.color = Color.RED
                 paintText.textSize = 22f
                 paintText.style = Paint.Style.FILL
                 paintText.setShadowLayer(0.7f, 0.7f, 0.7f, Color.YELLOW)
-
                 val rectText = Rect()
                 paintText.getTextBounds(captionString, 0, captionString.length, rectText)
                 newCanvas.drawText(captionString, 0f, rectText.height().toFloat(), paintText)
             }
-
             //} catch (FileNotFoundException e) {
         } catch (e: Exception) {
             e.printStackTrace()

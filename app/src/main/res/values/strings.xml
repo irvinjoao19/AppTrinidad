@@ -101,4 +101,11 @@
     <string name="texto_envio2">Envios de Reparación y Trabajos</string>
     <string name="texto_envio1">Enviar Vehiculos</string>
     <string name="close">Cerrar</string>
+    <string name="ancho">Ancho</string>
+    <string name="m2">M2</string>
+    <string name="obra">Obra</string>
+    <string name="n_poste">N° Poste</string>
+    <string name="adicionar_puntos_antes_off_despues_on">Adicionar Puntos Antes (Off) | Despues (On)</string>
+    <string name="nombre_del_punto">Nombre del Punto</string>
+    <string name="largo">Largo</string>
 </resources>
