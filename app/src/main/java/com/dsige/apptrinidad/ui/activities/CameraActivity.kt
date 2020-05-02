@@ -24,6 +24,19 @@ class CameraActivity : DaggerAppCompatActivity() {
                     )
                 )
                 .commit()
+        } else {
+            savedInstanceState ?: supportFragmentManager.beginTransaction()
+                .replace(
+                    R.id.container,
+                    CameraFragment.newInstance(
+                        1,
+                        "1",
+                        1,
+                        1,
+                        2
+                    )
+                )
+                .commit()
         }
     }
 }

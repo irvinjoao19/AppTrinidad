@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.*
 import android.hardware.camera2.*
-import android.media.Image
 import android.media.ImageReader
 import android.os.*
 import android.util.Log
@@ -224,13 +223,14 @@ class CameraFragment : Fragment(), View.OnClickListener, View.OnTouchListener {
      * still image is ready to be saved.
      */
     private val onImageAvailableListener = ImageReader.OnImageAvailableListener {
-        val img: Image? = it.acquireLatestImage()
-        if (img != null) {
-            backgroundHandler?.post(ImageSaver(img, file))
-        } else {
-            img?.close()
-            return@OnImageAvailableListener
-        }
+        backgroundHandler?.post(ImageSaver(it.acquireLatestImage(), file))
+//        val img: Image? = it.acquireLatestImage()
+//        if (img != null) {
+//            backgroundHandler?.post(ImageSaver(it.acquireLatestImage(), file))
+//        } else {
+//            img?.close()
+//            return@OnImageAvailableListener
+//        }
     }
 
     /**
@@ -314,9 +314,7 @@ class CameraFragment : Fragment(), View.OnClickListener, View.OnTouchListener {
         }
 
         override fun onCaptureProgressed(
-            session: CameraCaptureSession,
-            request: CaptureRequest,
-            partialResult: CaptureResult
+            session: CameraCaptureSession, request: CaptureRequest, partialResult: CaptureResult
         ) {
             process(partialResult)
         }
@@ -409,28 +407,14 @@ class CameraFragment : Fragment(), View.OnClickListener, View.OnTouchListener {
                     listOf(*map.getOutputSizes(ImageFormat.JPEG)),
                     CompareSizesByArea()
                 )
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    imageReader = ImageReader.newInstance(
-                        640,
-                        480,
-                        ImageFormat.JPEG,
-                        2,
-                        1000
-                    ).apply {
-                        setOnImageAvailableListener(onImageAvailableListener, backgroundHandler)
-                    }
-                } else {
-                    imageReader = ImageReader.newInstance(
-                        640,
-                        480,
-                        ImageFormat.JPEG,
-                        1
-                    ).apply {
-                        setOnImageAvailableListener(onImageAvailableListener, backgroundHandler)
-                    }
+                imageReader = ImageReader.newInstance(
+                    640,
+                    480,
+                    ImageFormat.JPEG,
+                    1
+                ).apply {
+                    setOnImageAvailableListener(onImageAvailableListener, backgroundHandler)
                 }
-
                 // Find out if we need to swap dimension to get the preview size relative to sensor
                 // coordinate.
                 val displayRotation = activity!!.windowManager.defaultDisplay.rotation
@@ -755,29 +739,31 @@ class CameraFragment : Fragment(), View.OnClickListener, View.OnTouchListener {
                 override fun onCaptureCompleted(
                     s: CameraCaptureSession, request: CaptureRequest, result: TotalCaptureResult
                 ) {
-                    if (tipo == 0) {
-                        startActivityForResult(
-                            Intent(context!!, PreviewCameraActivity::class.java)
-                                .putExtra("nameImg", nameImg)
-                                .putExtra("tipo", tipo)
-                                .putExtra("usuarioId", usuarioId)
-                                .putExtra("id", registroId)
-                                .putExtra("detalleId", detalleId)
-                                .putExtra("tipoDetalle", tipoDetalle), 1
-                        )
-                    } else {
-                        startActivity(
-                            Intent(context!!, PreviewCameraActivity::class.java)
-                                .putExtra("nameImg", nameImg)
-                                .putExtra("tipo", tipo)
-                                .putExtra("usuarioId", usuarioId)
-                                .putExtra("id", registroId)
-                                .putExtra("detalleId", detalleId)
-                                .putExtra("tipoDetalle", tipoDetalle)
-                        )
-                        activity!!.finish()
-                    }
                     unlockFocus()
+                    Handler().postDelayed({
+                        if (tipo == 0) {
+                            startActivityForResult(
+                                Intent(context!!, PreviewCameraActivity::class.java)
+                                    .putExtra("nameImg", nameImg)
+                                    .putExtra("tipo", tipo)
+                                    .putExtra("usuarioId", usuarioId)
+                                    .putExtra("id", registroId)
+                                    .putExtra("detalleId", detalleId)
+                                    .putExtra("tipoDetalle", tipoDetalle), 1
+                            )
+                        } else {
+                            startActivity(
+                                Intent(context!!, PreviewCameraActivity::class.java)
+                                    .putExtra("nameImg", nameImg)
+                                    .putExtra("tipo", tipo)
+                                    .putExtra("usuarioId", usuarioId)
+                                    .putExtra("id", registroId)
+                                    .putExtra("detalleId", detalleId)
+                                    .putExtra("tipoDetalle", tipoDetalle)
+                            )
+                            activity!!.finish()
+                        }
+                    },200)
                 }
             }
 

@@ -10,6 +10,7 @@ import android.content.Intent
 import android.graphics.*
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.provider.MediaStore
 import android.provider.Settings
 import android.telephony.TelephonyManager
@@ -36,7 +37,7 @@ import java.util.*
 
 object Util {
 
-    val FolderImg = "GoRelax/Galeria"
+    val Folder = "Dsige/Trinidad"
     val UrlFoto = "http://www.dsige.com/webApiDemo/image/"
     val UrlMovie = "http://www.dsige.com/webApiDemo/movie/"
 
@@ -167,15 +168,35 @@ object Util {
     }
 
     fun getFolder(context: Context): File {
-        val folder = File(context.getExternalFilesDir(null)!!.absolutePath)
+//        val folder = File(context.getExternalFilesDir(null)!!.absolutePath)
+//        if (!folder.exists()) {
+//            val success = folder.mkdirs()
+//            if (!success) {
+//                folder.mkdir()
+//            }
+//        }
+//        return folder
+
+
+        val folder =
+            File(Environment.getExternalStorageDirectory(), Folder)
+
         if (!folder.exists()) {
-            val success = folder.mkdirs()
-            if (!success) {
-                folder.mkdir()
-            }
+            folder.mkdirs()
         }
         return folder
+
+//        val folder = File(Environment.getExternalStorageDirectory(), FolderImg)
+//        if (!folder.exists()) {
+//            val success = folder.mkdirs()
+//            if (!success) {
+//                folder.mkdir()
+//                folder.createNewFile()
+//            }
+//        }
+//        return folder
     }
+
 
     fun getFolderPhoto(context: Context): File {
         val folder = File(context.getExternalFilesDir(null)!!.absolutePath)

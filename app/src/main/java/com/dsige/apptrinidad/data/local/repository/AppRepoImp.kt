@@ -65,7 +65,7 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
 
             Util.deleteDirectory(
                 File(
-                    Environment.getExternalStorageDirectory(), Util.FolderImg
+                    Environment.getExternalStorageDirectory(), Util.Folder
                 )
             )
             dataBase.servicioDao().deleteAll()

@@ -3,6 +3,7 @@ package com.dsige.apptrinidad.ui.activities
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.os.Environment
 import android.os.Handler
 import android.util.Log
 import android.view.View
@@ -49,6 +50,7 @@ class PreviewCameraActivity : DaggerAppCompatActivity(), View.OnClickListener {
     var tipo: Int = 0
     var usuarioId: String = ""
     var tipoDetalle: Int = 0
+    private val Folder = "/Dsige/Trinidad/"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,7 +75,10 @@ class PreviewCameraActivity : DaggerAppCompatActivity(), View.OnClickListener {
         textViewImg.text = nameImg
 
         Handler().postDelayed({
-            val f = File(Util.getFolder(this), nameImg)
+            val f = File(
+                Environment.getExternalStorageDirectory()
+                    .toString() + Folder + "/$nameImg"
+            )
             Picasso.get().load(f)
                 .into(imageView, object : Callback {
                     override fun onSuccess() {
