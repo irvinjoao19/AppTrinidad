@@ -1,10 +1,14 @@
 package com.dsige.apptrinidad.data.viewModel
 
 import android.content.Context
+import android.content.Intent
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.paging.PagedList
+import com.dsige.apptrinidad.data.local.model.Estado
 import com.dsige.apptrinidad.data.local.model.MenuPrincipal
 import com.dsige.apptrinidad.data.local.model.Registro
 import com.dsige.apptrinidad.data.local.model.RegistroDetalle
@@ -26,6 +30,7 @@ internal constructor(private val roomRepository: AppRepository) :
 
     val mensajeError: MutableLiveData<String> = MutableLiveData()
     val mensajeSuccess: MutableLiveData<String> = MutableLiveData()
+    val search: MutableLiveData<String> = MutableLiveData()
 
     fun setError(s: String) {
         mensajeError.value = s
@@ -99,7 +104,6 @@ internal constructor(private val roomRepository: AppRepository) :
             .subscribe(object : CompletableObserver {
                 override fun onComplete() {
                     mensajeSuccess.value = tipo
-
                 }
 
                 override fun onSubscribe(d: Disposable) {
@@ -164,7 +168,6 @@ internal constructor(private val roomRepository: AppRepository) :
                 }
 
                 override fun onComplete() {
-                    mensajeSuccess.value = "Eliminado"
                 }
 
                 override fun onError(e: Throwable) {
@@ -191,9 +194,21 @@ internal constructor(private val roomRepository: AppRepository) :
             })
     }
 
-
     fun getRegistroByTipo(tipo: Int): LiveData<List<Registro>> {
         return roomRepository.getRegistroByTipo(tipo)
+    }
+
+    fun getRegistroByTipoPaging(tipo:Int): LiveData<PagedList<Registro>> {
+        return Transformations.switchMap(search) { input ->
+            if (input == null || input.isEmpty()) {
+                roomRepository.getRegistroPagingByTipo(tipo)
+            } else {
+                roomRepository.getRegistroPagingByTipo(
+                    tipo,
+                    input //String.format("%s%s%s", "%", input, "%")
+                )
+            }
+        }
     }
 
     fun getRegistroPagingByTipo(tipo: Int): LiveData<PagedList<Registro>> {
@@ -208,8 +223,8 @@ internal constructor(private val roomRepository: AppRepository) :
         return roomRepository.getRegistroDetalleById(id)
     }
 
-    fun closeRegistro(registroId: Int,detalleId: Int, tipoDetalle:Int,tipo: Int) {
-        roomRepository.closeRegistroDetalle(registroId,detalleId,tipoDetalle, tipo)
+    fun closeRegistro(registroId: Int, detalleId: Int, tipoDetalle: Int, tipo: Int) {
+        roomRepository.closeRegistroDetalle(registroId, detalleId, tipoDetalle, tipo)
             .subscribeOn(Schedulers.computation())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(object : CompletableObserver {
@@ -247,6 +262,29 @@ internal constructor(private val roomRepository: AppRepository) :
                     mensajeError.value = e.toString()
                 }
 
+            })
+    }
+
+    fun getEstados(): LiveData<List<Estado>> {
+        return roomRepository.getEstados()
+    }
+
+    fun generarArchivo(nameImg: String, context: Context, data: Intent) {
+        Util.getFolderAdjunto(nameImg, context, data)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : CompletableObserver {
+                override fun onComplete() {
+                    mensajeSuccess.value = nameImg
+                }
+
+                override fun onSubscribe(d: Disposable) {
+
+                }
+
+                override fun onError(e: Throwable) {
+                    Log.i("TAG", e.toString())
+                }
             })
     }
 }

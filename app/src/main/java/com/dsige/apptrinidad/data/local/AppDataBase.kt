@@ -16,9 +16,10 @@ import com.dsige.apptrinidad.data.local.model.*
         Parametro::class,
         Vehiculo::class,
         VehiculoControl::class,
-        VehiculoVales::class
+        VehiculoVales::class,
+        Estado::class
     ],
-    version = 15,
+    version = 16,
     exportSchema = false
 )
 abstract class AppDataBase : RoomDatabase() {
@@ -31,6 +32,7 @@ abstract class AppDataBase : RoomDatabase() {
     abstract fun vehiculoDao(): VehiculoDao
     abstract fun vehiculoControlDao(): VehiculoControlDao
     abstract fun vehiculoValesDao(): VehiculoValesDao
+    abstract fun estadoDao(): EstadoDao
 
     companion object {
         @Volatile
@@ -43,9 +45,9 @@ abstract class AppDataBase : RoomDatabase() {
             synchronized(AppDataBase::class.java) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(
-                            context.applicationContext,
-                            AppDataBase::class.java, "lds_db"
-                        )
+                        context.applicationContext,
+                        AppDataBase::class.java, "lds_db"
+                    )
                         .fallbackToDestructiveMigration()
                         .build()
                 }

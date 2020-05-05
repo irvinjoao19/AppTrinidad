@@ -83,6 +83,8 @@ interface AppRepository {
 
     fun getRegistroPagingByTipo(tipo: Int): LiveData<PagedList<Registro>>
 
+    fun getRegistroPagingByTipo(tipo: Int,s:String): LiveData<PagedList<Registro>>
+
     fun getRegistroByObra(o: String): LiveData<List<Registro>>
 
     fun getDetalleIdentity(): LiveData<Int>
@@ -118,4 +120,6 @@ interface AppRepository {
     fun updateVehiculo(messages: Mensaje): Completable
 
     fun closeVerificationVehiculo(placa: String): Observable<String>
+
+    fun getEstados(): LiveData<List<Estado>>
 }

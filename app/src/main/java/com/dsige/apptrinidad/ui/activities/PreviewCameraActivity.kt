@@ -29,12 +29,16 @@ class PreviewCameraActivity : DaggerAppCompatActivity(), View.OnClickListener {
                 finish()
             } else
                 registroViewModel.updateFoto(tipoDetalle, nameImg, detalleId, registroId)
-            R.id.fabClose -> if (tipo == 0) {
-                setResult(Activity.RESULT_CANCELED, Intent())
+            R.id.fabClose -> if (galery) {
                 finish()
             } else {
-                startActivity(Intent(this, CameraActivity::class.java))
-                finish()
+                if (tipo == 0) {
+                    setResult(Activity.RESULT_CANCELED, Intent())
+                    finish()
+                } else {
+                    startActivity(Intent(this, CameraActivity::class.java))
+                    finish()
+                }
             }
         }
     }
@@ -50,6 +54,7 @@ class PreviewCameraActivity : DaggerAppCompatActivity(), View.OnClickListener {
     var tipo: Int = 0
     var usuarioId: String = ""
     var tipoDetalle: Int = 0
+    var galery: Boolean = false
     private val Folder = "/Dsige/Trinidad/"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,6 +67,7 @@ class PreviewCameraActivity : DaggerAppCompatActivity(), View.OnClickListener {
             usuarioId = b.getString("usuarioId")!!
             tipoDetalle = b.getInt("tipoDetalle")
             detalleId = b.getInt("detalleId")
+            galery = b.getBoolean("galery")
             bindUI(b.getInt("id"), b.getInt("detalleId"))
         }
     }
@@ -91,7 +97,7 @@ class PreviewCameraActivity : DaggerAppCompatActivity(), View.OnClickListener {
                 })
         }, 200)
 
-        if (tipo != 0){
+        if (tipo != 0) {
             if (id == 0) {
                 registroViewModel.getIdentity().observe(this, Observer<Int> { i ->
                     registroId = i

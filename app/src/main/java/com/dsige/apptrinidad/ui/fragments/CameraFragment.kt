@@ -224,13 +224,6 @@ class CameraFragment : Fragment(), View.OnClickListener, View.OnTouchListener {
      */
     private val onImageAvailableListener = ImageReader.OnImageAvailableListener {
         backgroundHandler?.post(ImageSaver(it.acquireLatestImage(), file))
-//        val img: Image? = it.acquireLatestImage()
-//        if (img != null) {
-//            backgroundHandler?.post(ImageSaver(it.acquireLatestImage(), file))
-//        } else {
-//            img?.close()
-//            return@OnImageAvailableListener
-//        }
     }
 
     /**
@@ -749,7 +742,8 @@ class CameraFragment : Fragment(), View.OnClickListener, View.OnTouchListener {
                                     .putExtra("usuarioId", usuarioId)
                                     .putExtra("id", registroId)
                                     .putExtra("detalleId", detalleId)
-                                    .putExtra("tipoDetalle", tipoDetalle), 1
+                                    .putExtra("tipoDetalle", tipoDetalle)
+                                    .putExtra("galery", false), 1
                             )
                         } else {
                             startActivity(
@@ -760,10 +754,11 @@ class CameraFragment : Fragment(), View.OnClickListener, View.OnTouchListener {
                                     .putExtra("id", registroId)
                                     .putExtra("detalleId", detalleId)
                                     .putExtra("tipoDetalle", tipoDetalle)
+                                    .putExtra("galery", false)
                             )
                             activity!!.finish()
                         }
-                    },200)
+                    }, 200)
                 }
             }
 

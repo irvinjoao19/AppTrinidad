@@ -41,8 +41,8 @@ interface RegistroDao {
     @Query("DELETE FROM Registro")
     fun deleteAll()
 
-    @Query("UPDATE Registro SET active = 2 , identity=:retorno WHERE registroId =:id")
-    fun updateRegistroEstado(id: Int, retorno: Int)
+    @Query("UPDATE Registro SET active = 2 , estado = :e , identity=:retorno WHERE registroId =:id")
+    fun updateRegistroEstado(id: Int, retorno: Int,e:String)
 
     @Query("UPDATE Registro SET estado =:e")
     fun updateRegistroMasivoEstado(e: Int)
@@ -59,12 +59,16 @@ interface RegistroDao {
     @Query("SELECT * FROM Registro WHERE tipo =:t GROUP BY nroObra")
     fun getRegistroPagingByTipo(t: Int): DataSource.Factory<Int, Registro>
 
+//    @Query("SELECT * FROM Registro WHERE tipo =:t AND estado LIKE :s GROUP BY nroObra")
+    @Query("SELECT * FROM Registro WHERE tipo =:t AND estado =:s GROUP BY nroObra")
+    fun getRegistroPagingByTipo(t: Int,s:String): DataSource.Factory<Int, Registro>
+
     @Query("SELECT * FROM Registro WHERE nroObra =:o")
     fun getRegistroByObra(o: String): LiveData<List<Registro>>
 
     @Query("UPDATE Registro SET foto =:name ,active = 1 WHERE registroId =:id")
     fun updatePhoto(id: Int, name: String)
 
-    @Query("UPDATE Registro SET active = 1 WHERE registroId =:id")
-    fun closeRegistro(id: Int)
+    @Query("UPDATE Registro SET active = 1 , estado = :e WHERE registroId =:id")
+    fun closeRegistro(id: Int,e:String)
 }

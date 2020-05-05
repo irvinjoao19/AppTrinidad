@@ -40,4 +40,8 @@ interface OnItemClickListener {
     interface ValeListener {
         fun onItemClick(c: VehiculoVales, view: View, position: Int)
     }
+
+    interface EstadoListener {
+        fun onItemClick(c: Estado, view: View, position: Int)
+    }
 }

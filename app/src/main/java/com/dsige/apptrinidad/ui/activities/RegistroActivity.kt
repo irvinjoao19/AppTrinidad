@@ -1,7 +1,9 @@
 package com.dsige.apptrinidad.ui.activities
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -17,6 +19,7 @@ import com.dsige.apptrinidad.data.local.model.RegistroDetalle
 import com.dsige.apptrinidad.data.viewModel.*
 import com.dsige.apptrinidad.data.viewModel.ViewModelFactory
 import com.dsige.apptrinidad.helper.Gps
+import com.dsige.apptrinidad.helper.Permission
 import com.dsige.apptrinidad.helper.Util
 import com.dsige.apptrinidad.ui.adapters.PhotoAdapter
 import com.dsige.apptrinidad.ui.listeners.OnItemClickListener
@@ -155,7 +158,26 @@ class RegistroActivity : DaggerAppCompatActivity(), View.OnClickListener, TextWa
 
                 if (s == "1") {
                     goCamera()
+                    return@Observer
                 }
+
+                if (s == "2") {
+                    goGalery()
+                    return@Observer
+                }
+
+                startActivity(
+                    Intent(this, PreviewCameraActivity::class.java)
+                        .putExtra("tipo", r.tipo)
+                        .putExtra("nameImg", s)
+                        .putExtra("usuarioId", r.usuarioId)
+                        .putExtra("id", r.usuarioId)
+                        .putExtra("detalleId", detalleId)
+                        .putExtra("tipoDetalle",  if (tipoDetalle == 0) 1 else tipoDetalle)
+                        .putExtra("galery", true)
+
+                )
+                finish()
             }
         })
 
@@ -236,8 +258,9 @@ class RegistroActivity : DaggerAppCompatActivity(), View.OnClickListener, TextWa
                 r.latitud = gps.latitude.toString()
                 r.longitud = gps.longitude.toString()
                 r.punto = editTextNombrePunto.text.toString().trim()
+                r.estado = "065"
                 r.active = 0
-                
+
                 val d = RegistroDetalle()
                 d.nombrePunto = editTextNombrePunto.text.toString().trim()
                 d.tipo = if (checkbox.isChecked) 2 else 1
@@ -291,6 +314,11 @@ class RegistroActivity : DaggerAppCompatActivity(), View.OnClickListener, TextWa
         finish()
     }
 
+    private fun goGalery() {
+        val i = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
+        startActivityForResult(i, Permission.GALERY_REQUEST)
+    }
+
     override fun afterTextChanged(p0: Editable?) {
         val a = when {
             editTextAncho.text.toString().isEmpty() -> 0.0
@@ -311,5 +339,18 @@ class RegistroActivity : DaggerAppCompatActivity(), View.OnClickListener, TextWa
 
     override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
 
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == Permission.GALERY_REQUEST && resultCode == Activity.RESULT_OK) {
+            if (data != null) {
+                registroViewModel.generarArchivo(
+                    Util.getFechaActualForPhoto(r.usuarioId),
+                    this,
+                    data
+                )
+            }
+        }
     }
 }

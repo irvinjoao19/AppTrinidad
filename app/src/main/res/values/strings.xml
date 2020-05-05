@@ -108,4 +108,5 @@
     <string name="adicionar_puntos_antes_off_despues_on">Adicionar Puntos Antes (Off) | Despues (On)</string>
     <string name="nombre_del_punto">Nombre del Punto</string>
     <string name="largo">Largo</string>
+    <string name="estado">Seleccione Estado</string>
 </resources>

@@ -90,7 +90,5 @@ class VehicleRegisterActivity : DaggerAppCompatActivity() {
 
             override fun onTabReselected(tab: TabLayout.Tab) {}
         })
-
-
     }
 }

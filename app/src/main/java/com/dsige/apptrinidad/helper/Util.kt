@@ -703,7 +703,8 @@ object Util {
                         Log.i("TAG", "FILE CREATED")
                     }
                     copyFile(File(getRealPathFromURI(context, data.data!!)), f)
-                    comprimirImagen(imagepath)
+//                    shrinkBitmapOnlyReduceCamera2(imagepath)
+                    getAngleImage(imagepath)
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }

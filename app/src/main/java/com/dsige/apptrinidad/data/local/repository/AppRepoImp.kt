@@ -90,6 +90,11 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
             if (c != null) {
                 dataBase.parametroDao().insertParametroListTask(c)
             }
+
+            val e: List<Estado>? = s.estados
+            if (e != null) {
+                dataBase.estadoDao().insertEstadoListTask(e)
+            }
         }
     }
 
@@ -139,7 +144,7 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
 
     override fun updateRegistro(m: Mensaje): Completable {
         return Completable.fromAction {
-            dataBase.registroDao().updateRegistroEstado(m.codigoBase, m.codigoRetorno)
+            dataBase.registroDao().updateRegistroEstado(m.codigoBase, m.codigoRetorno,"067")
 //            dataBase.registroDetalleDao().updateRegistroPhotoEstado(m.codigoBase)
         }
     }
@@ -262,6 +267,15 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         )
     }
 
+    override fun getRegistroPagingByTipo(tipo: Int, s: String): LiveData<PagedList<Registro>> {
+        return dataBase.registroDao().getRegistroPagingByTipo(tipo, s).toLiveData(
+            Config(
+                pageSize = 20,
+                enablePlaceholders = true
+            )
+        )
+    }
+
     override fun getRegistroByObra(o: String): LiveData<List<Registro>> {
         return dataBase.registroDao().getRegistroByObra(o)
     }
@@ -370,7 +384,7 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
                 }
                 2 -> {
                     dataBase.registroDetalleDao().closeRegistroDetalle1(detalleId)
-                    dataBase.registroDao().closeRegistro(registroId)
+                    dataBase.registroDao().closeRegistro(registroId,"066")
                 }
             }
         }
@@ -442,5 +456,9 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
             }
 
         }
+    }
+
+    override fun getEstados(): LiveData<List<Estado>> {
+        return dataBase.estadoDao().getEstado()
     }
 }

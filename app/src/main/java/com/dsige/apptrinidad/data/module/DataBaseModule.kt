@@ -34,7 +34,6 @@ class DataBaseModule {
         return appDataBase.usuarioDao()
     }
 
-
     @Provides
     internal fun provideParametroDao(appDataBase: AppDataBase): ParametroDao {
         return appDataBase.parametroDao()
@@ -55,21 +54,23 @@ class DataBaseModule {
         return appDataBase.servicioDao()
     }
 
-
     @Provides
     internal fun provideVehiculoDao(appDataBase: AppDataBase): VehiculoDao {
         return appDataBase.vehiculoDao()
     }
-
 
     @Provides
     internal fun provideVehiculoControlDao(appDataBase: AppDataBase): VehiculoControlDao {
         return appDataBase.vehiculoControlDao()
     }
 
-
     @Provides
     internal fun provideVehiculoValesDao(appDataBase: AppDataBase): VehiculoValesDao {
         return appDataBase.vehiculoValesDao()
+    }
+
+    @Provides
+    internal fun provideEstadoDao(appDataBase: AppDataBase): EstadoDao {
+        return appDataBase.estadoDao()
     }
 }
